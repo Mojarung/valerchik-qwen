@@ -1,0 +1,8 @@
+Картинка: 5-stern.png | Длительность: 5 сек | Бесшовный цикл: нет
+Назначение: состояние «нарушение правил общения» (строгая)
+
+EN:
+cute chibi grey rat in a headset looks stern and disapproving, arms crossed, eyebrows furrowed, slowly shakes head no, taps foot impatiently, ears slightly back, static camera, plain white background, consistent 2D cartoon sticker style, no text
+
+RU:
+крыска в гарнитуре строго качает головой, лапки скрещены, брови нахмурены, нетерпеливо притопывает, ушки чуть назад, статичная камера, белый фон

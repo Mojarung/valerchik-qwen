@@ -1,0 +1,11 @@
+[project]
+name = "valerchik-stt"
+version = "1.0.0"
+description = "Локальный STT-микросервис (faster-whisper, CPU, русский)"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141",
+    "uvicorn>=0.52",
+    "faster-whisper>=1.2",
+    "python-multipart>=0.0.20",
+]

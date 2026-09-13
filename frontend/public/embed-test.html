@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Демо: сайт с виджетом Валерчика</title>
+  <style>
+    * { margin: 0; box-sizing: border-box; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; color: #1f2430; background: #fff; }
+    header { padding: 18px 6vw; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid #e8e8ee; }
+    header b { font-size: 18px; }
+    header nav { margin-left: auto; display: flex; gap: 18px; font-size: 14px; color: #666; }
+    .hero { padding: 9vh 6vw; background: linear-gradient(160deg, #f7f8fb, #eef1f7); }
+    .hero h1 { font-size: clamp(28px, 4vw, 44px); max-width: 640px; line-height: 1.15; }
+    .hero p { margin-top: 14px; color: #555; max-width: 520px; line-height: 1.5; }
+    .hero button { margin-top: 24px; padding: 13px 26px; border: 0; border-radius: 999px;
+      background: #1f2430; color: #fff; font-size: 15px; cursor: pointer; }
+    section { padding: 48px 6vw; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .card { border: 1px solid #e8e8ee; border-radius: 16px; padding: 20px; }
+    .card h3 { font-size: 15px; margin-bottom: 8px; }
+    .card p { font-size: 13px; color: #666; line-height: 1.5; }
+    footer { padding: 32px 6vw; color: #999; font-size: 12px; border-top: 1px solid #e8e8ee; }
+  </style>
+</head>
+<body>
+  <header><b>ООО «Ромашка-Снаб»</b><nav><span>Каталог</span><span>Доставка</span><span>Контакты</span></nav></header>
+  <div class="hero">
+    <h1>Канцтовары и офисная мебель для госзаказчиков</h1>
+    <p>Работаем на Портале поставщиков с 2019 года. 4 800 исполненных контрактов,
+       отгрузка по Москве — на следующий день.</p>
+    <button>Смотреть каталог</button>
+  </div>
+  <section>
+    <div class="cards">
+      <div class="card"><h3>Котировочные сессии</h3><p>Участвуем ежедневно, средняя скидка 12%.</p></div>
+      <div class="card"><h3>Оферты в витрине</h3><p>1 200 позиций СТЕ с актуальными ценами.</p></div>
+      <div class="card"><h3>Электронное актирование</h3><p>УПД в день поставки, без бумаги.</p></div>
+    </div>
+  </section>
+  <footer>Демо-страница стороннего сайта. Виджет поддержки подключён одной строкой ниже.</footer>
+
+  <!-- виджет Валерчика: одна строка (на чужом сайте — полный URL до вашего хоста) -->
+  <script src="/embed.js" defer></script>
+  <script>
+    // для скриншотов и демо: ?open — автоматически открыть виджет (без анимаций)
+    if (location.search.includes("open")) {
+      const style = document.createElement("style");
+      style.textContent = "#valerchik-frame,#valerchik-btn,#valerchik-btn svg{transition:none !important}";
+      document.head.appendChild(style);
+      const t = setInterval(() => {
+        const b = document.getElementById("valerchik-btn");
+        if (b) { clearInterval(t); b.click(); }
+      }, 300);
+    }
+  </script>
+</body>
+</html>

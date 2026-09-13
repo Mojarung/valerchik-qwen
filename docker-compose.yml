@@ -1,0 +1,439 @@
+# Весь стек одной командой:  docker compose up -d --build
+# Масштабирование API:        docker compose up -d --scale api=3
+# С голосом (ввод и озвучка): docker compose --profile voice up -d --build
+# С реранкером:               docker compose --profile rerank up -d --build
+# С разбором PDF и картинками: docker compose --profile docs up -d --build
+# С объектным хранилищем S3:  docker compose --profile s3 up -d --build
+
+name: valerchik
+
+# У сервисов, которые собираются из исходников, рядом с build указано и image.
+# Причина: на сервере обновление идёт через `docker compose pull` — без имени
+# образа тянуть нечего, и деплой молча поднимал бы то, что уже лежит локально.
+# С именем один и тот же файл работает в обе стороны: локально `up --build`
+# собирает и метит образ этим именем, на сервере `pull` забирает его из GHCR.
+# IMAGE_TAG позволяет откатиться на конкретную версию: IMAGE_TAG=v1.0.0.
+# Имя реестра только в нижнем регистре — заглавных букв docker в нём не примет.
+
+x-backend-env: &backend-env
+  APP_MODE: full
+  # `:?` вместо значения по умолчанию: стенд с известным секретом и паролем
+  # админа поднимался одной командой и так же уезжал на сервер.
+  APP_SECRET: ${APP_SECRET:?задайте APP_SECRET в .env — 32+ случайных символа}
+  DATA_DIR: /data
+  DATABASE_URL: postgresql+asyncpg://support:${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в .env}@postgres:5432/support
+  REDIS_URL: redis://redis:6379/0
+  QDRANT_URL: http://qdrant:6333
+  TEI_URL: http://tei:80
+  TEI_RERANK_URL: ${TEI_RERANK_URL:-}
+  # Нейросеть против оскорблений. Сервис необязательный: недоступен — guardrails
+  # работают на правилах и словаре, чат не ломается.
+  TOXICITY_URL: ${TOXICITY_URL:-http://tei-toxicity:80}
+  STT_URL: ${STT_URL:-http://stt:9000}
+  # Синтез речи (тот же профиль voice). Пусто — чат работает молча: озвучка
+  # необязательна, и её отсутствие не должно ничего ломать.
+  TTS_URL: ${TTS_URL:-http://tts:9000}
+  # Разбор PDF с картинками (профиль docs). Пусто — импорт идёт через markitdown,
+  # текстом и без иллюстраций.
+  DOCPARSE_URL: ${DOCPARSE_URL:-}
+  # Хранилище картинок. Пусто — общий том данных; задан endpoint — любое
+  # S3-совместимое хранилище (профиль s3 поднимает MinIO рядом).
+  S3_ENDPOINT: ${S3_ENDPOINT:-}
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+  S3_BUCKET: ${S3_BUCKET:-valerchik-kb}
+  # MCP-сервер каталога товаров портала. Адрес известен заранее, поэтому запись в
+  # реестре MCP заводится сама при старте — иначе интеграцию пришлось бы каждый раз
+  # добавлять руками через админку. Пусто — не регистрировать.
+  ZAKUPKI_MCP_URL: ${ZAKUPKI_MCP_URL:-http://zakupki-mcp:9200/mcp}
+  # Портал отдаёт картинки товаров только на адреса в РФ; сервер за границей
+  # задаёт здесь свой прокси картинок в РФ (см. app/routers/catalog.py)
+  PORTAL_IMAGE_BASE: ${PORTAL_IMAGE_BASE:-https://zakupki.mos.ru}
+  LLM_BASE_URL: ${LLM_BASE_URL:-}
+  LLM_API_KEY: ${LLM_API_KEY:-}
+  LLM_MODEL: ${LLM_MODEL:-}
+  SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:?задайте ADMIN_PASSWORD в .env}
+  OPERATOR_PASSWORD: ${OPERATOR_PASSWORD:?задайте OPERATOR_PASSWORD в .env}
+  # За nginx исходный адрес клиента виден только в X-Forwarded-For. Разбирает его
+  # uvicorn и верит ему лишь от адресов подсети compose: иначе клиент, дописав
+  # заголовок сам, выбирал бы себе ведро лимита входа и чата.
+  FORWARDED_ALLOW_IPS: ${COMPOSE_SUBNET:-172.31.240.0/24}
+  # Пусто — принимаем только свой origin. Список нужен, когда фронт живёт на
+  # другом домене; расширение проходит по отдельному правилу.
+  ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    mem_limit: 1g
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: support
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в .env}
+      POSTGRES_DB: support
+    volumes:
+      - pgdata:/var/lib/postgresql  # PG18: точка монтирования каталога с данными изменилась
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U support"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  redis:
+    image: redis:8-alpine
+    # maxmemory 256mb плюс запас на fork при сохранении снимка
+    mem_limit: 512m
+    restart: unless-stopped
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.0
+    mem_limit: 1g
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+
+  # локальный опенсорс-эмбеддер для русского (sergeyzh/BERTA ~ 98% качества FRIDA при 0.1B параметров)
+  tei:
+    # На Apple Silicon задайте TEI_IMAGE=...:cpu-arm64-latest: иначе Podman
+    # запускает x86_64-образ через эмуляцию и переиндексация занимает часы.
+    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-1.9}
+    # Потолок памяти: эмбеддер грузит модель целиком, и без предела OOM-киллер хоста
+    # уносит соседей, а не виновника.
+    mem_limit: 3g
+    restart: unless-stopped
+    command:
+      [
+        "--model-id", "${EMBED_MODEL:-sergeyzh/BERTA}",
+        "--max-client-batch-size", "64",
+        # Моделям с длинным контекстом (Qwen3) на CPU прогрев с 16384 токенами в пачке не хватает памяти
+        "--max-batch-tokens", "${TEI_MAX_BATCH_TOKENS:-16384}",
+        "--auto-truncate",
+      ]
+    volumes:
+      - tei_cache:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/80' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+
+  # Классификатор оскорблений (cointegrated/rubert-tiny-toxicity, 45 МБ): второе
+  # мнение после правил guardrails. Тот же образ TEI, что у эмбеддера, — лишнего
+  # качать не нужно; модель крошечная, отвечает за миллисекунды и держит ~130 МБ.
+  tei-toxicity:
+    # Та же переменная, что у эмбеддера: на Apple Silicon одна настройка
+    # переводит на arm64-образ оба сервиса.
+    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-1.9}
+    mem_limit: 512m
+    restart: unless-stopped
+    command: ["--model-id", "${TOXICITY_MODEL:-cointegrated/rubert-tiny-toxicity}"]
+    volumes:
+      - tei_toxicity_cache:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/80' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # Тома приложения — обычной учётке (uid 10001) до старта сервисов. Образы
+  # работают без root, а тома, созданные ещё root-контейнерами, остались за root:
+  # после обновления api не мог дописать классификатор, docparse — создать
+  # каталог разбора, stt и tts — модели. Сервис разовый и меняет владельца
+  # только у того, что ещё не передано, поэтому повторный старт стоит секунды.
+  # Образ postgres — уже в стеке, лишнего качать не нужно. Тома профилей
+  # подключены все сразу: без профиля это просто пустой том.
+  volume-owner:
+    image: postgres:18-alpine
+    mem_limit: 64m
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["find /volumes/* ! -user 10001 -exec chown -h 10001:10001 {} +"]
+    volumes:
+      - app_data:/volumes/app_data
+      - stt_models:/volumes/stt_models
+      - tts_voices:/volumes/tts_voices
+      - docparse_models:/volumes/docparse_models
+    restart: "no"
+
+  api:
+    build: ./backend
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-api:${IMAGE_TAG:-latest}
+    # Только на localhost: наружу api торчит через nginx фронтенда (порт APP_PORT),
+    # этот проброс нужен лишь локальному dev-серверу vite (proxy на localhost:8000).
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    environment: *backend-env
+    # Потолок памяти: без него промах (например выгрузка на большой базе)
+    # ловится OOM-киллером хоста, который уносит заодно и соседние контейнеры.
+    # С лимитом умирает только api — и тут же поднимается сам.
+    mem_limit: 2g
+    restart: unless-stopped
+    volumes:
+      - app_data:/data
+    depends_on:
+      volume-owner: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      qdrant: { condition: service_started }
+      # именно healthy: сид индексирует БЗ через эмбеддер, а TEI на первом старте
+      # ещё скачивает модель — иначе startup падает на ConnectError
+      tei: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  worker:
+    build: ./backend
+    # Тот же образ, что у api: воркер отличается только командой запуска.
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-api:${IMAGE_TAG:-latest}
+    # Больше, чем у api: воркер разбирает документы до 128 МБ, и таблица на сотню
+    # тысяч строк целиком проходит через память.
+    mem_limit: 3g
+    restart: unless-stopped
+    command: ["taskiq", "worker", "app.tasks.broker:broker", "app.tasks.jobs"]
+    environment:
+      <<: *backend-env
+      SEED_ON_STARTUP: "false"
+    volumes:
+      - app_data:/data
+    depends_on:
+      volume-owner: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # Резервные копии по расписанию. Отдельный контейнер, а не задача внутри API:
+  # pg_dump обязан быть не старше сервера, и образ postgres даёт эту гарантию
+  # даром — в питоновский образ API его пришлось бы доставлять руками и следить
+  # за версией. Расписание лежит в настройках админки (backup.*), контейнер
+  # перечитывает их раз в минуту.
+  backup:
+    image: postgres:18-alpine
+    mem_limit: 256m
+    entrypoint: ["/bin/sh", "/scripts/backup-loop.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: support
+      PGPASSWORD: ${POSTGRES_PASSWORD:-support}
+      PGDATABASE: support
+      BACKUP_DIR: /backups
+    volumes:
+      - ./scripts/backup-loop.sh:/scripts/backup-loop.sh:ro
+      # Только чтение: задача копии — снять данные, а не менять их
+      - app_data:/data:ro
+      # Каталог на хосте, а не том: копию должно быть видно и легко унести
+      - ./backups:/backups
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+  # Поиск товаров каталога zakupki.mos.ru как набор инструментов агента.
+  # Отдельным сервисом, а не модулем внутри API, по двум причинам: его инструменты
+  # нужны и внешним MCP-клиентам тоже, а хождение к чужому порталу с собственным
+  # лимитом скорости и кэшем не должно делить процесс с ответами пользователям.
+  # Порт наружу не публикуется — сервис нужен только соседним контейнерам.
+  zakupki-mcp:
+    build: ./zakupki-mcp
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-zakupki-mcp:${IMAGE_TAG:-latest}
+    mem_limit: 512m
+    environment:
+      ZAKUPKI_RPS: ${ZAKUPKI_RPS:-2.0}
+      ZAKUPKI_THUMB_SIZE: ${ZAKUPKI_THUMB_SIZE:-300}
+    restart: unless-stopped
+    healthcheck:
+      # MCP отвечает только на POST с сессией, поэтому http-проба здесь не годится:
+      # проверяем, что порт слушает. Живой сокет = процесс поднялся и принимает.
+      test: ["CMD-SHELL", "python -c \"import socket;socket.create_connection(('127.0.0.1',9200),3)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  frontend:
+    build: ./frontend
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-frontend:${IMAGE_TAG:-latest}
+    mem_limit: 128m
+    restart: unless-stopped
+    ports:
+      # внутри 8080: nginx работает без root и низкие порты занять не может
+      - "${APP_PORT:-8090}:8080"
+    depends_on:
+      - api
+
+  # --- профиль voice: локальный STT (faster-whisper) ---
+  stt:
+    build: ./stt-service
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-stt:${IMAGE_TAG:-latest}
+    # модель small в int8 на CPU — около гигабайта на пике распознавания
+    mem_limit: 2g
+    restart: unless-stopped
+    profiles: ["voice"]
+    environment:
+      STT_MODEL: ${STT_MODEL:-small}
+      # Кэш моделей теперь в домашнем каталоге обычной учётки: контейнер больше
+      # не работает от root, и путь /root ему недоступен.
+      HF_HOME: /home/app/.cache/huggingface
+    volumes:
+      - stt_models:/home/app/.cache/huggingface
+    depends_on:
+      volume-owner: { condition: service_completed_successfully }
+
+  # --- профиль voice: локальный синтез речи (Piper, ONNX на CPU) ---
+  # Piper, а не Silero: onnxruntime весит десятки мегабайт, torch — почти
+  # гигабайт ради того же результата на том же процессоре.
+  tts:
+    build: ./tts-service
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-tts:${IMAGE_TAG:-latest}
+    mem_limit: 512m
+    restart: unless-stopped
+    profiles: ["voice"]
+    environment:
+      TTS_VOICE: ${TTS_VOICE:-ru_RU-dmitri-medium}
+      TTS_VOICE_DIR: /data/voices
+    volumes:
+      - tts_voices:/data/voices
+    depends_on:
+      volume-owner: { condition: service_completed_successfully }
+
+  # --- профиль docs: разбор PDF с разметкой страниц и вырезкой иллюстраций ---
+  # Отдельный контейнер, потому что docling тянет torch и веса моделей — больше
+  # гигабайта, которому нечего делать в образе API. Том app_data общий с воркером:
+  # через него передаются вырезанные картинки, минуя сеть.
+  docparse:
+    build: ./docparse-service
+    image: ${IMAGE_PREFIX:-ghcr.io/mojarung/tender_hack_nijniy_2026}-docparse:${IMAGE_TAG:-latest}
+    # Потолок памяти: docling тянет torch и держит веса разметки в памяти, и без предела OOM-киллер хоста
+    # уносит соседей, а не виновника.
+    mem_limit: 6g
+    restart: unless-stopped
+    profiles: ["docs"]
+    environment:
+      DOCPARSE_SPOOL: /data/docparse
+      DOCPARSE_IMAGES_SCALE: ${DOCPARSE_IMAGES_SCALE:-2}
+    volumes:
+      - app_data:/data
+      - docparse_models:/models
+    depends_on:
+      volume-owner: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:9100/health', timeout=3)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+
+  # --- профиль s3: объектное хранилище картинок базы знаний ---
+  # По умолчанию картинки лежат в томе данных — этого достаточно, пока инстансы
+  # API делят один том. S3 нужен, когда они разъезжаются по машинам.
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    mem_limit: 1g
+    restart: unless-stopped
+    profiles: ["s3"]
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-valerchik}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-valerchik-secret}
+    ports:
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # --- профиль rerank: cross-encoder дожим выдачи ---
+  # DiTy/cross-encoder-russian-msmarco (~180M) — русский, быстрый на CPU.
+  # Тяжёлая альтернатива: RERANK_MODEL=BAAI/bge-reranker-v2-m3 (568M, точнее, но медленнее)
+  tei-rerank:
+    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-1.9}
+    # Потолок памяти: cross-encoder такой же тяжёлый, как эмбеддер, и без предела OOM-киллер хоста
+    # уносит соседей, а не виновника.
+    mem_limit: 3g
+    restart: unless-stopped
+    profiles: ["rerank"]
+    command: ["--model-id", "${RERANK_MODEL:-DiTy/cross-encoder-russian-msmarco}"]
+    volumes:
+      - tei_rerank_cache:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/80' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+
+  # --- профиль ollama: своя LLM на этой машине (qwen3.8:27b через Ollama) ---
+  # Флаг, а не базовый стек: модель весит ~18 ГБ и без GPU отвечает минутами, поэтому
+  # сама она не скачивается. Пока модель крутится на отдельном GPU-сервере, профиль не
+  # нужен — LLM_BASE_URL смотрит туда. Включить: COMPOSE_PROFILES=ollama и в .env
+  # LLM_BASE_URL=http://ollama:11434/v1, LLM_API_KEY=ollama, LLM_MODEL=qwen3.8:27b.
+  # На хосте с NVIDIA добавьте сервису `gpus: all`, иначе Ollama считает на CPU.
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    # Без GPU модель целиком в оперативной памяти: 18 ГБ весов плюс кэш контекста
+    mem_limit: ${OLLAMA_MEM_LIMIT:-32g}
+    restart: unless-stopped
+    profiles: ["ollama"]
+    environment:
+      # Кэш контекста в q8_0 вдвое легче f16, а flash attention — условие для него
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
+      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-32768}
+      # Модель держится в памяти: повторная загрузка 18 ГБ на каждый вопрос — десятки секунд
+      OLLAMA_KEEP_ALIVE: "-1"
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # Одноразовая скачка модели в том ollama_models; повторный запуск докачивает только разницу.
+  ollama-pull:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    # Клиент только просит сервер скачать модель — сам почти ничего не держит
+    mem_limit: 256m
+    profiles: ["ollama"]
+    restart: "no"
+    entrypoint: ["ollama", "pull", "${OLLAMA_MODEL:-qwen3.8:27b}"]
+    environment:
+      OLLAMA_HOST: ollama:11434
+    depends_on:
+      ollama: { condition: service_healthy }
+
+# Подсеть задана явно: только от её адресов API принимает X-Forwarded-For
+# (FORWARDED_ALLOW_IPS). Занята на хосте — COMPOSE_SUBNET в .env.
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${COMPOSE_SUBNET:-172.31.240.0/24}
+
+volumes:
+  pgdata:
+  qdrant_data:
+  tei_cache:
+  tei_rerank_cache:
+  tei_toxicity_cache:
+  app_data:
+  stt_models:
+  tts_voices:
+  docparse_models:
+  minio_data:
+  ollama_models:

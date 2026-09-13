@@ -1,0 +1,27 @@
+[project]
+name = "valerchik-docparse"
+version = "1.0.0"
+description = "Разбор PDF с разметкой страниц и извлечением иллюстраций (docling, CPU)"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141",
+    "uvicorn>=0.52",
+    "python-multipart>=0.0.20",
+    "docling>=2.55",
+    # torch и torchvision перечислены явно, хотя приходят транзитивно с docling:
+    # без прямой зависимости uv игнорирует переопределение индекса ниже и тянет
+    # сборку с CUDA — это лишние ~2 ГБ образа при инференсе на процессоре.
+    "torch>=2.6",
+    "torchvision>=0.21",
+]
+
+# torch ставим из CPU-индекса: по умолчанию приезжает сборка с CUDA — это лишние
+# гигабайты образа и времени сборки, а инференс всё равно идёт на процессоре.
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

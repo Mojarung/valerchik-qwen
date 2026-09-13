@@ -1,0 +1,108 @@
+[project]
+name = "support-ai"
+version = "0.1.0"
+description = "AI-сервис автоматизации поддержки Портала поставщиков (zakupki.mos.ru)"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.141",
+    "uvicorn[standard]>=0.52",
+    "pydantic>=2.13",
+    "pydantic-settings>=2.15",
+    "pydantic-ai-slim[openai,mcp]>=2.27",
+    "sqlalchemy[asyncio]>=2.0.51",
+    "aiosqlite>=0.22",
+    "asyncpg>=0.31",
+    "redis>=8.1",
+    "fakeredis>=2.37",
+    "httpx>=0.28",
+    "pyjwt>=2.10",
+    "numpy>=2.5",
+    "python-multipart>=0.0.20",
+    "prometheus-client>=0.21",
+    "taskiq>=0.12",
+    "taskiq-redis>=1.2",
+    "sqladmin>=0.31",
+    "itsdangerous>=2.2.0",
+    # разбор методичек при импорте неформализованной базы знаний
+    "markitdown[pdf,docx,xlsx,xls,pptx]>=0.1.6",
+    "pypdf>=6.1",       # markitdown отдаёт текст, картинки достаём сами
+    "pillow>=11.0",     # отсев мусорных врезок и нормализация формата картинок
+    "boto3>=1.35",      # S3-совместимое хранилище картинок
+    "snowballstemmer>=3.1.1",
+    "pymorphy3>=2.0.6",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3.1",
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+    "pytest-cov>=7.1",
+    "pyyaml>=6.0.3",
+    "ruff>=0.16",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py314"
+
+[tool.ruff.lint]
+# C90 и PLR09xx держат функции обозримыми: ветвлений, аргументов и строк не
+# больше, чем помещается в голове; PLR2004 — пороги только именованными
+# константами, чтобы у каждого числа было объяснение, откуда оно.
+select = [
+    "E", "F", "I", "UP", "B", "ASYNC", "BLE", "RUF100", "ANN201", "ANN205", "ANN206",
+    "C90", "PLR0912", "PLR0913", "PLR0915", "PLR2004",
+]
+ignore = ["B008"]  # FastAPI Depends() в аргументах по умолчанию
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-branches = 12
+max-statements = 50
+
+[tool.ruff.lint.per-file-ignores]
+# Тип возврата у теста — всегда None, и объявлять его в четырёхстах функциях
+# значит спрятать полезные срабатывания ANN в шуме.
+# Числа в assert — ожидаемые значения, а не пороги: имена им не нужны.
+"tests/**" = ["ANN", "PLR2004"]
+"app/tools/support_*.py" = ["ANN", "PLR0915", "PLR2004", "ASYNC240"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    # интеграционные клиенты внешних сервисов — проверяются e2e в docker-окружении
+    "app/adapters/stt.py",
+    "app/tasks/broker.py",
+    "app/tasks/worker.py",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+
+[tool.mypy]
+python_version = "3.14"
+files = ["app"]
+# Сторонние пакеты без аннотаций (docling, fakeredis и т. п.) не должны валить
+# проверку; всё своё — строго.
+ignore_missing_imports = true
+# Строгий режим целиком: у каждой функции аннотации, у обобщённых типов —
+# параметры, никакого молчаливого Any из нетипизированного кода. Только так
+# обращение к несуществующему полю rt или svc ловится до запуска, а не на стенде.
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+# Конструкторы моделей проверяются по типам полей, лишний аргумент — ошибка
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true

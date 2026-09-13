@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://tenderhack.ru/valerchik">
+  <bpmn:collaboration id="Collab_Quality">
+    <bpmn:participant id="Participant_Quality" name="Оценка качества работы специалистов по отзывам" processRef="Process_Quality" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Quality" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Quality">
+      <bpmn:lane id="Lane_0" name="Администратор">
+        <bpmn:flowNodeRef>StartPeriod</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Actions</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_1" name="Система">
+        <bpmn:flowNodeRef>Collect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Sentiment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Cluster</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Rank</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Conclusion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwSystemic</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndReport</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartPeriod" name="Отчёт по расписанию или по кнопке"><bpmn:outgoing>Flow_0</bpmn:outgoing></bpmn:startEvent>
+    <bpmn:task id="Collect" name="Собрать отзывы и оценки за период"><bpmn:incoming>Flow_0</bpmn:incoming><bpmn:outgoing>Flow_1</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Sentiment" name="Определить тональность комментариев"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Cluster" name="Сгруппировать негатив по эмбеддингам"><bpmn:documentation>Одна проблема в трёх формулировках — один кластер, а не три редких жалобы.</bpmn:documentation><bpmn:incoming>Flow_2</bpmn:incoming><bpmn:outgoing>Flow_3</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Rank" name="Посчитать рейтинг специалистов, включая ИИ"><bpmn:documentation>Средняя оценка, доля негатива, тональность; ИИ ранжируется наравне с людьми.</bpmn:documentation><bpmn:incoming>Flow_3</bpmn:incoming><bpmn:outgoing>Flow_4</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Conclusion" name="Сформировать содержательное заключение"><bpmn:documentation>Системные проблемы, а не список жалоб: шаблон либо генерация через LLM.</bpmn:documentation><bpmn:incoming>Flow_4</bpmn:incoming><bpmn:outgoing>Flow_5</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwSystemic" name="Найдены системные проблемы?"><bpmn:incoming>Flow_5</bpmn:incoming><bpmn:outgoing>Flow_6</bpmn:outgoing><bpmn:outgoing>Flow_8</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:task id="Actions" name="Пополнить базу знаний и обучение операторов"><bpmn:incoming>Flow_6</bpmn:incoming><bpmn:outgoing>Flow_7</bpmn:outgoing></bpmn:task>
+    <bpmn:endEvent id="EndReport" name="Отчёт в админ-панели"><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:incoming>Flow_8</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0" sourceRef="StartPeriod" targetRef="Collect" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Collect" targetRef="Sentiment" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Sentiment" targetRef="Cluster" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Cluster" targetRef="Rank" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Rank" targetRef="Conclusion" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Conclusion" targetRef="GwSystemic" />
+    <bpmn:sequenceFlow id="Flow_6" name="да" sourceRef="GwSystemic" targetRef="Actions" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Actions" targetRef="EndReport" />
+    <bpmn:sequenceFlow id="Flow_8" name="нет" sourceRef="GwSystemic" targetRef="EndReport" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Quality">
+    <bpmndi:BPMNPlane id="Plane_Quality" bpmnElement="Collab_Quality">
+      <bpmndi:BPMNShape id="Shape_Participant_Quality" bpmnElement="Participant_Quality" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="1918" height="244" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_0" bpmnElement="Lane_0" isHorizontal="true">
+        <dc:Bounds x="30" y="0" width="1888" height="122" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_1" bpmnElement="Lane_1" isHorizontal="true">
+        <dc:Bounds x="30" y="122" width="1888" height="122" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartPeriod" bpmnElement="StartPeriod">
+        <dc:Bounds x="112" y="43" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Collect" bpmnElement="Collect">
+        <dc:Bounds x="260" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Sentiment" bpmnElement="Sentiment">
+        <dc:Bounds x="470" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Cluster" bpmnElement="Cluster">
+        <dc:Bounds x="680" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Rank" bpmnElement="Rank">
+        <dc:Bounds x="890" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Conclusion" bpmnElement="Conclusion">
+        <dc:Bounds x="1100" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwSystemic" bpmnElement="GwSystemic">
+        <dc:Bounds x="1365" y="158" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Actions" bpmnElement="Actions">
+        <dc:Bounds x="1520" y="24" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndReport" bpmnElement="EndReport">
+        <dc:Bounds x="1792" y="165" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_0" bpmnElement="Flow_0">
+        <di:waypoint x="148" y="61" />
+        <di:waypoint x="204" y="61" />
+        <di:waypoint x="204" y="183" />
+        <di:waypoint x="260" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_1" bpmnElement="Flow_1">
+        <di:waypoint x="420" y="183" />
+        <di:waypoint x="470" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_2" bpmnElement="Flow_2">
+        <di:waypoint x="630" y="183" />
+        <di:waypoint x="680" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_3" bpmnElement="Flow_3">
+        <di:waypoint x="840" y="183" />
+        <di:waypoint x="890" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_4" bpmnElement="Flow_4">
+        <di:waypoint x="1050" y="183" />
+        <di:waypoint x="1100" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_5" bpmnElement="Flow_5">
+        <di:waypoint x="1260" y="183" />
+        <di:waypoint x="1365" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_6" bpmnElement="Flow_6">
+        <di:waypoint x="1415" y="183" />
+        <di:waypoint x="1468" y="183" />
+        <di:waypoint x="1468" y="61" />
+        <di:waypoint x="1520" y="61" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_7" bpmnElement="Flow_7">
+        <di:waypoint x="1680" y="61" />
+        <di:waypoint x="1758" y="61" />
+        <di:waypoint x="1758" y="183" />
+        <di:waypoint x="1792" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_8" bpmnElement="Flow_8">
+        <di:waypoint x="1415" y="183" />
+        <di:waypoint x="1792" y="183" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

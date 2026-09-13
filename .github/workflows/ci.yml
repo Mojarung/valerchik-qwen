@@ -1,0 +1,305 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Пуш в ветку с открытым PR запускал пайплайн дважды; старый прогон теперь
+# отменяется — очередь Actions не забивается устаревшими сборками.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend · lint + tests (py3.14)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Sync dependencies
+        working-directory: backend
+        run: uv sync --frozen
+
+      - name: Ruff (lint)
+        working-directory: backend
+        run: uv run ruff check app tests
+
+      # Форматтер отдельной проверкой: `ruff check` о расхождении с ним молчит,
+      # и 104 файла из 133 разъехались незамеченными.
+      - name: Ruff (format)
+        working-directory: backend
+        run: uv run ruff format --check app tests
+
+      - name: Mypy
+        working-directory: backend
+        run: uv run mypy
+
+      - name: Pytest + coverage gate 80%
+        working-directory: backend
+        run: uv run pytest --cov --cov-report=term --cov-report=xml -q
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: backend/coverage.xml
+
+  catalog:
+    name: Каталог · lint + tests (MCP-сервер портала)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: zakupki-mcp/uv.lock
+
+      - name: Sync dependencies
+        working-directory: zakupki-mcp
+        run: uv sync --frozen
+
+      - name: Ruff (lint)
+        working-directory: zakupki-mcp
+        run: uv run ruff check .
+
+      # Портал подменён httpx.MockTransport — в сеть тесты не ходят и от
+      # доступности zakupki.mos.ru не зависят.
+      - name: Pytest
+        working-directory: zakupki-mcp
+        run: uv run pytest -q
+
+  services:
+    name: Микросервисы и скрипты · lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # У обёрток stt/tts/docparse и внешнего MCP-сервера нет dev-зависимостей:
+      # ruff берётся отдельным инструментом, правила — из корневого ruff.toml.
+      # Линт разбирает исходники и установки самих пакетов не требует, поэтому
+      # проверка стоит секунды, а не минуты на выкачивании torch.
+      - name: Ruff (lint)
+        run: uvx ruff@0.16 check docparse-service tts-service stt-service mcp-server scripts
+
+      # Формат сервисов проверяем тем же инструментом, что и backend: без этого
+      # шага «зелёный линт» ничего не говорил о расхождении с форматтером.
+      - name: Ruff format (микросервисы, MCP, скрипты)
+        run: uvx ruff@0.16 format --check docparse-service tts-service stt-service mcp-server zakupki-mcp scripts
+
+      # Слой инструментов обоих MCP-серверов: до этого его не проверял никто,
+      # и сломанный импорт доезжал до внешнего агента.
+      - name: Тесты MCP-сервера поддержки
+        working-directory: mcp-server
+        run: uv sync --frozen && uv run pytest -q
+
+  bpmn:
+    name: BPMN · схемы совпадают с генератором
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # Схема (.bpmn) и картинка (.svg) собираются из одного описания в
+      # scripts/bpmn.py — только стандартная библиотека, зависимостей нет.
+      # Если файлы правили руками, перегенерация даст расхождение: значит, в
+      # презентацию уедет не то, что лежит в исходнике схемы.
+      - name: Перегенерировать схемы
+        run: uv run --no-project --python 3.14 python scripts/bpmn.py
+
+      - name: Проверить, что ничего не разошлось
+        run: git diff --exit-code -- docs/bpmn
+
+  extension:
+    name: Расширение · тесты, линтер, манифест
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: extension/package-lock.json
+      # Чат внутри расширения — сборка frontend (widget/), остальное грузится в
+      # браузер как есть: манифест разбирается, каждый скрипт компилируется.
+      # Живой прогон на портале (scripts/e2e.mjs) в CI не идёт: нужен Edge и
+      # доступ к zakupki.mos.ru.
+      - name: Виджет
+        working-directory: frontend
+        run: npm ci && npm run build:extension
+      - name: Зависимости расширения
+        working-directory: extension
+        run: npm ci
+      # Проверки, которых не видно глазами на портале: переход по чужому адресу,
+      # протухшее состояние подсказки, утечка введённого в запись сценария
+      - name: Тесты
+        working-directory: extension
+        run: npm test
+      # Сборки у расширения нет, опечатку в имени переменной поймать больше
+      # нечем: контент-скрипт падает молча, страница продолжает работать
+      - name: Линтер
+        working-directory: extension
+        run: npm run lint
+      - name: Манифест
+        working-directory: extension
+        run: node -e "const m=JSON.parse(require('fs').readFileSync('manifest.json','utf8')); if (m.manifest_version!==3) throw new Error('MV3'); for (const f of [...m.content_scripts.flatMap(c=>c.js), m.background.service_worker, ...m.web_accessible_resources.flatMap(w=>w.resources).map(r=>r.endsWith('/*')?r.slice(0,-2)+'/index.html':r), ...Object.values(m.icons)]) require('fs').accessSync(f); console.log('manifest ok')"
+      - name: Синтаксис скриптов
+        working-directory: extension
+        run: for f in background.js chat-frame.js content/*.js options/*.js scripts/*.mjs; do node --check "$f"; done
+      # Каталог сценариев обязан быть валидным JSON: его читает и сервер, и тесты
+      - name: Каталог сценариев
+        run: node -e "const g=JSON.parse(require('fs').readFileSync('backend/app/guides/portal.json','utf8')); console.log('guides:', g.guides.length)"
+
+  frontend:
+    name: Frontend · typecheck + build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+      # Типы ответов API генерируются из схемы бэкенда: файл в репозитории
+      # обязан быть ровно тем, что даёт генератор из frontend/openapi.json.
+      # Совпадение самой схемы с приложением проверяет бэкенд-тест.
+      - name: Типы API актуальны
+        working-directory: frontend
+        run: |
+          npm ci --prefix tools/openapi-types
+          npm run api:types
+          git diff --exit-code src/lib/api-schema.ts
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+      - name: Тесты
+        working-directory: frontend
+        run: npm test
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      # Доступность проверяем по отрендеренной странице: поля без подписи и
+      # страницы без заголовка в JSX не видны, а жюри их замечает сразу.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Стенд для проверки доступности
+        working-directory: backend
+        # Интерпретатор из .venv, а не `uv run`: фоновый uv держит блокировку кэша
+        # до конца задачи, и пост-шаг setup-uv (`uv cache prune`) ждал её пять
+        # минут, а потом валил всю задачу — вместе с пропуском сборки образов.
+        run: |
+          uv sync --frozen
+          .venv/bin/python -m uvicorn app.main:app --port 8090 > "$RUNNER_TEMP/stand.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/stand.pid"
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:8090/api/health > /dev/null && break; sleep 1; done
+          curl -sf http://127.0.0.1:8090/api/health || { cat "$RUNNER_TEMP/stand.log"; exit 1; }
+      - name: Браузер для проверки
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Доступность
+        working-directory: frontend
+        run: npm run a11y
+      - name: Остановить стенд
+        if: always()
+        run: kill "$(cat "$RUNNER_TEMP/stand.pid" 2>/dev/null)" 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+  compose:
+    name: Compose · конфигурация
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      # Файл compose проверяется, как код: опечатка в ключе или подстановке иначе
+      # всплыла бы только при деплое. Секреты — заглушки: config их лишь подставляет.
+      - name: docker compose config
+        env:
+          APP_SECRET: ci-placeholder-secret-0123456789abcdef
+          POSTGRES_PASSWORD: ci-placeholder
+          ADMIN_PASSWORD: ci-placeholder
+          OPERATOR_PASSWORD: ci-placeholder
+        run: docker compose --profile voice --profile rerank --profile docs --profile s3 config --quiet
+
+  docker:
+    name: Docker · ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [backend, frontend, catalog]
+    strategy:
+      # Один упавший образ не должен скрывать состояние остальных.
+      fail-fast: false
+      matrix:
+        include:
+          - { name: backend, context: backend, cache: max }
+          - { name: frontend, context: frontend, cache: max }
+          - { name: zakupki-mcp, context: zakupki-mcp, cache: max }
+          - { name: stt, context: stt-service, cache: max }
+          - { name: tts, context: tts-service, cache: max }
+          # docling тянет torch: слой на пару гигабайт. mode=max съел бы почти
+          # весь десятигигабайтный кэш Actions и вытеснил оттуда остальные
+          # образы, поэтому здесь min — сборка дольше, зато кэш остальных цел.
+          - { name: docparse, context: docparse-service, cache: min }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: false
+          # api и фронт ниже ещё и запускаются: им нужен образ в локальном docker.
+          load: ${{ matrix.name == 'backend' || matrix.name == 'frontend' }}
+          tags: smoke/${{ matrix.name }}:ci
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=${{ matrix.cache }}
+      # Собрать образ без root мало: проверяем, что процесс поднимается от обычной
+      # учётки, пишет в свой том и отвечает.
+      - name: Smoke · api без root
+        if: matrix.name == 'backend'
+        run: |
+          docker run -d --name api -e DATA_DIR=/data -p 8000:8000 smoke/backend:ci
+          for _ in $(seq 1 60); do curl -fsS -o /dev/null http://127.0.0.1:8000/api/health && break; sleep 2; done
+          curl -fsS http://127.0.0.1:8000/api/health | grep -q '"db":"ok"' || { docker logs api; exit 1; }
+          uid=$(docker exec api id -u)
+          test "$uid" = 10001 || { echo "api работает от uid $uid"; exit 1; }
+      - name: Smoke · nginx без root
+        if: matrix.name == 'frontend'
+        run: |
+          docker run -d --name web -p 8080:8080 smoke/frontend:ci
+          for _ in $(seq 1 30); do curl -fsS -o /dev/null http://127.0.0.1:8080/ && break; sleep 1; done
+          curl -fsS http://127.0.0.1:8080/ | grep -q 'id="root"' || { docker logs web; exit 1; }
+          uid=$(docker exec web id -u)
+          test "$uid" != 0 || { echo "nginx работает от root"; exit 1; }

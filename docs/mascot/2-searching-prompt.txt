@@ -1,0 +1,8 @@
+Картинка: 2-searching.png | Длительность: 10 сек | Бесшовный цикл: да
+Назначение: состояние «ищет в базе знаний» (агент думает)
+
+EN:
+cute chibi grey rat in a headset rapidly flips through index cards in an open card file drawer, paws riffling the cards one by one, focused frown, ears perked, then pulls out one card and looks at it curiously, static camera, plain white background, consistent 2D cartoon sticker style, smooth bouncy animation, seamless loop, no text
+
+RU:
+крыска в гарнитуре быстро перебирает лапками карточки в выдвижном ящике картотеки, сосредоточенно хмурится, ушки торчком, затем вытаскивает одну карточку и с любопытством её рассматривает, статичная камера, белый фон, бесшовный цикл

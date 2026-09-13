@@ -1,0 +1,45 @@
+[project]
+name = "valerchik-zakupki-mcp"
+version = "1.0.0"
+description = "MCP-сервер: поиск товаров и картинок каталога Портала поставщиков (zakupki.mos.ru)"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=2.0",
+    "httpx>=0.28",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+    "ruff>=0.16",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+# C90 и PLR09xx держат функции обозримыми: ветвлений, аргументов и строк не
+# больше, чем помещается в голове; PLR2004 — пороги только именованными
+# константами, чтобы у каждого числа было объяснение, откуда оно.
+select = [
+    "E", "F", "I", "UP", "B", "ASYNC", "BLE", "RUF100", "ANN201", "ANN205", "ANN206",
+    "C90", "PLR0912", "PLR0913", "PLR0915", "PLR2004",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-branches = 12
+max-statements = 50
+
+[tool.ruff.lint.per-file-ignores]
+# Тип возврата у теста — всегда None, а числа в assert — ожидаемые значения,
+# а не пороги: ни то ни другое объявлять не нужно.
+"test_*.py" = ["ANN", "PLR2004"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

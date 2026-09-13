@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://tenderhack.ru/valerchik">
+  <bpmn:collaboration id="Collab_Support">
+    <bpmn:participant id="Participant_Support" name="Обработка обращения в службу поддержки Портала поставщиков" processRef="Process_Support" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Support" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Support">
+      <bpmn:lane id="Lane_0" name="Пользователь">
+        <bpmn:flowNodeRef>StartQuestion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>RateAnswer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndAuto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ConfirmSolution</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndOperator</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_1" name="Валерчик (ИИ-агент)">
+        <bpmn:flowNodeRef>CheckAbuse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwAbuse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>NotifyAbuse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndAbuse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Normalize</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SearchKb</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwConfidence</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>RecordGap</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>OfferOperator</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwAmbiguous</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>AskClarify</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Answer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwHelped</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Classify</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Enqueue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Assign</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_2" name="Оператор поддержки">
+        <bpmn:flowNodeRef>TakeCase</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>AcceptTimeout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Requeue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Copilot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>OperatorReply</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ProposeSolution</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartQuestion" name="Пользователь задал вопрос"><bpmn:documentation>Веб-чат, встроенный виджет на стороннем сайте или страница /widget.</bpmn:documentation><bpmn:outgoing>Flow_0</bpmn:outgoing></bpmn:startEvent>
+    <bpmn:task id="CheckAbuse" name="Проверить сообщение на нецензурную лексику"><bpmn:documentation>Нормализация обфускаций: гомоглифы, разделители, латиница, цензура звёздочками.</bpmn:documentation><bpmn:incoming>Flow_0</bpmn:incoming><bpmn:outgoing>Flow_1</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwAbuse" name="Нарушение правил общения?"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing><bpmn:outgoing>Flow_4</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:task id="NotifyAbuse" name="Уведомить о нарушении и завершить обращение"><bpmn:incoming>Flow_2</bpmn:incoming><bpmn:outgoing>Flow_3</bpmn:outgoing></bpmn:task>
+    <bpmn:endEvent id="EndAbuse" name="Обращение закрыто по правилам общения"><bpmn:incoming>Flow_3</bpmn:incoming></bpmn:endEvent>
+    <bpmn:task id="Normalize" name="Восстановить раскладку, учесть раздел портала"><bpmn:documentation>«Rfr pfhtubcnhbhjdfnmcz» → «Как зарегистрироваться». Раздел портала приходит от виджета и влияет на ранжирование.</bpmn:documentation><bpmn:incoming>Flow_4</bpmn:incoming><bpmn:outgoing>Flow_5</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="SearchKb" name="Найти ответ в базе знаний: вектор + BM25 + RRF"><bpmn:documentation>Гибридный поиск: BERTA через TEI в Qdrant, лексический BM25, слияние Reciprocal Rank Fusion, опционально cross-encoder реранкер.</bpmn:documentation><bpmn:incoming>Flow_5</bpmn:incoming><bpmn:incoming>Flow_11</bpmn:incoming><bpmn:outgoing>Flow_6</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwConfidence" name="Уверенность выше порога?"><bpmn:incoming>Flow_6</bpmn:incoming><bpmn:outgoing>Flow_7</bpmn:outgoing><bpmn:outgoing>Flow_9</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:task id="RecordGap" name="Зафиксировать вопрос как пробел базы знаний"><bpmn:documentation>Повторы группируются: пробел с частотой одним кликом становится статьёй.</bpmn:documentation><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:outgoing>Flow_8</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="OfferOperator" name="Сообщить, что ответа нет, и предложить оператора"><bpmn:incoming>Flow_8</bpmn:incoming><bpmn:outgoing>Flow_17</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwAmbiguous" name="Тема определяется однозначно?"><bpmn:incoming>Flow_9</bpmn:incoming><bpmn:outgoing>Flow_10</bpmn:outgoing><bpmn:outgoing>Flow_12</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:task id="AskClarify" name="Задать уточняющий вопрос"><bpmn:incoming>Flow_10</bpmn:incoming><bpmn:outgoing>Flow_11</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Answer" name="Ответить с источниками и уверенностью"><bpmn:incoming>Flow_12</bpmn:incoming><bpmn:outgoing>Flow_13</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="RateAnswer" name="Оценить ответ"><bpmn:documentation>Палец вверх/вниз в чате и оценка 1–5 при закрытии обращения.</bpmn:documentation><bpmn:incoming>Flow_13</bpmn:incoming><bpmn:outgoing>Flow_14</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwHelped" name="Ответ помог?"><bpmn:incoming>Flow_14</bpmn:incoming><bpmn:outgoing>Flow_15</bpmn:outgoing><bpmn:outgoing>Flow_16</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndAuto" name="Решено без оператора"><bpmn:incoming>Flow_15</bpmn:incoming></bpmn:endEvent>
+    <bpmn:task id="Classify" name="Определить линию поддержки"><bpmn:documentation>Softmax-регрессия на эмбеддингах, дообучается на статьях и реальных эскалациях.</bpmn:documentation><bpmn:incoming>Flow_16</bpmn:incoming><bpmn:incoming>Flow_17</bpmn:incoming><bpmn:outgoing>Flow_18</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Enqueue" name="Поставить обращение в очередь линии"><bpmn:incoming>Flow_18</bpmn:incoming><bpmn:outgoing>Flow_19</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Assign" name="Назначить свободному сотруднику с минимальной нагрузкой"><bpmn:incoming>Flow_19</bpmn:incoming><bpmn:incoming>Flow_22</bpmn:incoming><bpmn:outgoing>Flow_20</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="TakeCase" name="Принять назначение"><bpmn:incoming>Flow_20</bpmn:incoming><bpmn:outgoing>Flow_23</bpmn:outgoing></bpmn:task>
+    <bpmn:boundaryEvent id="AcceptTimeout" name="60 секунд" attachedToRef="TakeCase"><bpmn:outgoing>Flow_21</bpmn:outgoing><bpmn:timerEventDefinition id="Timer_AcceptTimeout" /></bpmn:boundaryEvent>
+    <bpmn:task id="Requeue" name="Вернуть в очередь без сброса времени ожидания"><bpmn:incoming>Flow_21</bpmn:incoming><bpmn:outgoing>Flow_22</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Copilot" name="Сводка, проверки, источники и черновик"><bpmn:incoming>Flow_23</bpmn:incoming><bpmn:incoming>Flow_28</bpmn:incoming><bpmn:outgoing>Flow_24</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="OperatorReply" name="Ответить или запросить сведения"><bpmn:incoming>Flow_24</bpmn:incoming><bpmn:outgoing>Flow_25</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="ProposeSolution" name="Предложить решение"><bpmn:incoming>Flow_25</bpmn:incoming><bpmn:outgoing>Flow_26</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="ConfirmSolution" name="Пользователь подтвердил решение?"><bpmn:incoming>Flow_26</bpmn:incoming><bpmn:outgoing>Flow_27</bpmn:outgoing><bpmn:outgoing>Flow_28</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndOperator" name="Решение подтверждено"><bpmn:incoming>Flow_27</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0" sourceRef="StartQuestion" targetRef="CheckAbuse" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="CheckAbuse" targetRef="GwAbuse" />
+    <bpmn:sequenceFlow id="Flow_2" name="да" sourceRef="GwAbuse" targetRef="NotifyAbuse" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="NotifyAbuse" targetRef="EndAbuse" />
+    <bpmn:sequenceFlow id="Flow_4" name="нет" sourceRef="GwAbuse" targetRef="Normalize" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Normalize" targetRef="SearchKb" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="SearchKb" targetRef="GwConfidence" />
+    <bpmn:sequenceFlow id="Flow_7" name="нет" sourceRef="GwConfidence" targetRef="RecordGap" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="RecordGap" targetRef="OfferOperator" />
+    <bpmn:sequenceFlow id="Flow_9" name="да" sourceRef="GwConfidence" targetRef="GwAmbiguous" />
+    <bpmn:sequenceFlow id="Flow_10" name="нет" sourceRef="GwAmbiguous" targetRef="AskClarify" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="AskClarify" targetRef="SearchKb" />
+    <bpmn:sequenceFlow id="Flow_12" name="да" sourceRef="GwAmbiguous" targetRef="Answer" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Answer" targetRef="RateAnswer" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="RateAnswer" targetRef="GwHelped" />
+    <bpmn:sequenceFlow id="Flow_15" name="да" sourceRef="GwHelped" targetRef="EndAuto" />
+    <bpmn:sequenceFlow id="Flow_16" name="нет" sourceRef="GwHelped" targetRef="Classify" />
+    <bpmn:sequenceFlow id="Flow_17" name="нужен оператор" sourceRef="OfferOperator" targetRef="Classify" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Classify" targetRef="Enqueue" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Enqueue" targetRef="Assign" />
+    <bpmn:sequenceFlow id="Flow_20" sourceRef="Assign" targetRef="TakeCase" />
+    <bpmn:sequenceFlow id="Flow_21" sourceRef="AcceptTimeout" targetRef="Requeue" />
+    <bpmn:sequenceFlow id="Flow_22" sourceRef="Requeue" targetRef="Assign" />
+    <bpmn:sequenceFlow id="Flow_23" sourceRef="TakeCase" targetRef="Copilot" />
+    <bpmn:sequenceFlow id="Flow_24" sourceRef="Copilot" targetRef="OperatorReply" />
+    <bpmn:sequenceFlow id="Flow_25" sourceRef="OperatorReply" targetRef="ProposeSolution" />
+    <bpmn:sequenceFlow id="Flow_26" sourceRef="ProposeSolution" targetRef="ConfirmSolution" />
+    <bpmn:sequenceFlow id="Flow_27" name="Помогло" sourceRef="ConfirmSolution" targetRef="EndOperator" />
+    <bpmn:sequenceFlow id="Flow_28" name="Не решено" sourceRef="ConfirmSolution" targetRef="Copilot" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Support">
+    <bpmndi:BPMNPlane id="Plane_Support" bpmnElement="Collab_Support">
+      <bpmndi:BPMNShape id="Shape_Participant_Support" bpmnElement="Participant_Support" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="4018" height="696" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_0" bpmnElement="Lane_0" isHorizontal="true">
+        <dc:Bounds x="30" y="0" width="3988" height="232" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_1" bpmnElement="Lane_1" isHorizontal="true">
+        <dc:Bounds x="30" y="232" width="3988" height="232" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_2" bpmnElement="Lane_2" isHorizontal="true">
+        <dc:Bounds x="30" y="464" width="3988" height="232" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartQuestion" bpmnElement="StartQuestion">
+        <dc:Bounds x="112" y="43" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CheckAbuse" bpmnElement="CheckAbuse">
+        <dc:Bounds x="260" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwAbuse" bpmnElement="GwAbuse">
+        <dc:Bounds x="525" y="268" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_NotifyAbuse" bpmnElement="NotifyAbuse">
+        <dc:Bounds x="470" y="366" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndAbuse" bpmnElement="EndAbuse">
+        <dc:Bounds x="742" y="385" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Normalize" bpmnElement="Normalize">
+        <dc:Bounds x="680" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SearchKb" bpmnElement="SearchKb">
+        <dc:Bounds x="890" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwConfidence" bpmnElement="GwConfidence">
+        <dc:Bounds x="1155" y="268" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RecordGap" bpmnElement="RecordGap">
+        <dc:Bounds x="1100" y="366" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_OfferOperator" bpmnElement="OfferOperator">
+        <dc:Bounds x="1310" y="366" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwAmbiguous" bpmnElement="GwAmbiguous">
+        <dc:Bounds x="1365" y="268" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AskClarify" bpmnElement="AskClarify">
+        <dc:Bounds x="1520" y="366" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Answer" bpmnElement="Answer">
+        <dc:Bounds x="1520" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RateAnswer" bpmnElement="RateAnswer">
+        <dc:Bounds x="1730" y="24" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwHelped" bpmnElement="GwHelped">
+        <dc:Bounds x="1995" y="268" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndAuto" bpmnElement="EndAuto">
+        <dc:Bounds x="2212" y="43" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Classify" bpmnElement="Classify">
+        <dc:Bounds x="2150" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Enqueue" bpmnElement="Enqueue">
+        <dc:Bounds x="2360" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Assign" bpmnElement="Assign">
+        <dc:Bounds x="2570" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_TakeCase" bpmnElement="TakeCase">
+        <dc:Bounds x="2780" y="488" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AcceptTimeout" bpmnElement="AcceptTimeout">
+        <dc:Bounds x="2890" y="544" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Requeue" bpmnElement="Requeue">
+        <dc:Bounds x="2780" y="598" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Copilot" bpmnElement="Copilot">
+        <dc:Bounds x="2990" y="488" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_OperatorReply" bpmnElement="OperatorReply">
+        <dc:Bounds x="3200" y="488" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ProposeSolution" bpmnElement="ProposeSolution">
+        <dc:Bounds x="3410" y="488" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ConfirmSolution" bpmnElement="ConfirmSolution">
+        <dc:Bounds x="3675" y="36" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndOperator" bpmnElement="EndOperator">
+        <dc:Bounds x="3892" y="43" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_0" bpmnElement="Flow_0">
+        <di:waypoint x="148" y="61" />
+        <di:waypoint x="204" y="61" />
+        <di:waypoint x="204" y="293" />
+        <di:waypoint x="260" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_1" bpmnElement="Flow_1">
+        <di:waypoint x="420" y="293" />
+        <di:waypoint x="525" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_2" bpmnElement="Flow_2">
+        <di:waypoint x="550" y="318" />
+        <di:waypoint x="550" y="366" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_3" bpmnElement="Flow_3">
+        <di:waypoint x="630" y="403" />
+        <di:waypoint x="742" y="403" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_4" bpmnElement="Flow_4">
+        <di:waypoint x="575" y="293" />
+        <di:waypoint x="680" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_5" bpmnElement="Flow_5">
+        <di:waypoint x="840" y="293" />
+        <di:waypoint x="890" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_6" bpmnElement="Flow_6">
+        <di:waypoint x="1050" y="293" />
+        <di:waypoint x="1155" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_7" bpmnElement="Flow_7">
+        <di:waypoint x="1180" y="318" />
+        <di:waypoint x="1180" y="366" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_8" bpmnElement="Flow_8">
+        <di:waypoint x="1260" y="403" />
+        <di:waypoint x="1310" y="403" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_9" bpmnElement="Flow_9">
+        <di:waypoint x="1205" y="293" />
+        <di:waypoint x="1365" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_10" bpmnElement="Flow_10">
+        <di:waypoint x="1390" y="318" />
+        <di:waypoint x="1390" y="403" />
+        <di:waypoint x="1520" y="403" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_11" bpmnElement="Flow_11">
+        <di:waypoint x="1600" y="440" />
+        <di:waypoint x="1600" y="452" />
+        <di:waypoint x="970" y="452" />
+        <di:waypoint x="970" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_12" bpmnElement="Flow_12">
+        <di:waypoint x="1415" y="293" />
+        <di:waypoint x="1520" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_13" bpmnElement="Flow_13">
+        <di:waypoint x="1680" y="293" />
+        <di:waypoint x="1705" y="293" />
+        <di:waypoint x="1705" y="61" />
+        <di:waypoint x="1730" y="61" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_14" bpmnElement="Flow_14">
+        <di:waypoint x="1890" y="61" />
+        <di:waypoint x="1942" y="61" />
+        <di:waypoint x="1942" y="293" />
+        <di:waypoint x="1995" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_15" bpmnElement="Flow_15">
+        <di:waypoint x="2045" y="293" />
+        <di:waypoint x="2128" y="293" />
+        <di:waypoint x="2128" y="61" />
+        <di:waypoint x="2212" y="61" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_16" bpmnElement="Flow_16">
+        <di:waypoint x="2045" y="293" />
+        <di:waypoint x="2150" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_17" bpmnElement="Flow_17">
+        <di:waypoint x="1470" y="403" />
+        <di:waypoint x="2116" y="403" />
+        <di:waypoint x="2116" y="293" />
+        <di:waypoint x="2150" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_18" bpmnElement="Flow_18">
+        <di:waypoint x="2310" y="293" />
+        <di:waypoint x="2360" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_19" bpmnElement="Flow_19">
+        <di:waypoint x="2520" y="293" />
+        <di:waypoint x="2570" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_20" bpmnElement="Flow_20">
+        <di:waypoint x="2730" y="293" />
+        <di:waypoint x="2755" y="293" />
+        <di:waypoint x="2755" y="525" />
+        <di:waypoint x="2780" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_21" bpmnElement="Flow_21">
+        <di:waypoint x="2908" y="580" />
+        <di:waypoint x="2908" y="635" />
+        <di:waypoint x="2780" y="635" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_22" bpmnElement="Flow_22">
+        <di:waypoint x="2860" y="672" />
+        <di:waypoint x="2860" y="684" />
+        <di:waypoint x="2650" y="684" />
+        <di:waypoint x="2650" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_23" bpmnElement="Flow_23">
+        <di:waypoint x="2940" y="525" />
+        <di:waypoint x="2990" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_24" bpmnElement="Flow_24">
+        <di:waypoint x="3150" y="525" />
+        <di:waypoint x="3200" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_25" bpmnElement="Flow_25">
+        <di:waypoint x="3360" y="525" />
+        <di:waypoint x="3410" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_26" bpmnElement="Flow_26">
+        <di:waypoint x="3570" y="525" />
+        <di:waypoint x="3622" y="525" />
+        <di:waypoint x="3622" y="61" />
+        <di:waypoint x="3675" y="61" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_27" bpmnElement="Flow_27">
+        <di:waypoint x="3725" y="61" />
+        <di:waypoint x="3892" y="61" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_28" bpmnElement="Flow_28">
+        <di:waypoint x="3700" y="86" />
+        <di:waypoint x="3700" y="684" />
+        <di:waypoint x="3070" y="684" />
+        <di:waypoint x="3070" y="562" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

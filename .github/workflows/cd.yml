@@ -1,0 +1,84 @@
+name: CD
+
+# Релиз по тегу: docker-образы -> GHCR, затем (опционально) деплой на сервер.
+#   git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  publish:
+    name: Publish ${{ matrix.name }} to GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      # Публикуем всё, что собирается из исходников. Сервисы под профилями
+      # (stt/tts/docparse) тоже: без образов в реестре сервер не сможет
+      # включить профиль voice или docs, а собирать их на проде нечем.
+      fail-fast: false
+      matrix:
+        include:
+          - { name: api, context: backend }
+          - { name: frontend, context: frontend }
+          - { name: zakupki-mcp, context: zakupki-mcp }
+          - { name: stt, context: stt-service }
+          - { name: tts, context: tts-service }
+          - { name: docparse, context: docparse-service }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Владелец репозитория пишется как зарегистрирован — с заглавными буквами.
+      # В имени образа docker их не принимает («repository name must be lowercase»),
+      # поэтому приводим префикс к нижнему регистру, а не подставляем как есть.
+      - name: Имя реестра в нижнем регистре
+        run: echo "IMAGE_PREFIX=${REGISTRY}/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.name }}:${{ github.ref_name }}
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.name }}:latest
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=max
+
+  deploy:
+    name: Deploy (docker compose pull && up)
+    runs-on: ubuntu-latest
+    needs: publish
+    # Деплой не пытается угадать «секретов нет — значит, шаг не нужен»: он включается
+    # явно репозиторной переменной, а без неё job вообще не запускается.
+    if: vars.DEPLOY_ENABLED == 'true'
+    steps:
+      - name: Deploy over SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          # Деплой включён переменной, но секретов может не хватать (забыли завести,
+          # опечатались в имени) — в этом случае job обязан упасть, а не тихо
+          # пропустить шаг и отрапортовать зелёным про несуществующий деплой.
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_KEY" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ]; then
+            echo "DEPLOY_ENABLED=true, но секреты DEPLOY_HOST/DEPLOY_USER/DEPLOY_KEY/DEPLOY_KNOWN_HOSTS заданы не все — деплой остановлен." >&2
+            exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          # known_hosts берём из секрета (вывод ssh-keyscan -H заранее), а не доверяем
+          # ключу хоста при первом подключении (TOFU) — иначе MITM на первом деплое
+          # молча подменит хост, и ssh никак этого не заметит.
+          echo "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          ssh -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" \
+            "cd /opt/valerchik && docker compose pull && docker compose up -d --no-deps api worker zakupki-mcp frontend"

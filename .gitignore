@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+node_modules
+frontend/dist/
+reports/
+
+# Env / secrets
+.env
+*.local
+
+# Data / artifacts
+data/
+!data/.gitkeep
+*.sqlite3
+*.db
+# Резервные копии: дампы базы и архивы картинок, им не место в репозитории
+backups/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Временные файлы для ручных проверок
+/_*.pdf
+/_*.wav
+
+# Виджет расширения собирается из frontend (npm run build:extension)
+extension/widget/

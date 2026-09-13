@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <title>Валерчик</title>
+  <style>
+    /* Тема — как в чате: он присылает выбранную, до этого действует системная.
+       Подложка видна, пока чат грузится, и белая вспышка в тёмной теме заметна. */
+    :root { color-scheme: light dark; }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"] { color-scheme: dark; }
+    html, body { margin: 0; height: 100%; background: transparent; }
+    iframe {
+      display: block; width: 100%; height: 100%; border: 0; border-radius: 24px;
+      background: light-dark(#fff, #1b1d22);
+    }
+    .err {
+      display: none; height: 100%; padding: 24px; box-sizing: border-box; border-radius: 24px;
+      font: 13px/1.5 "Inter", "Segoe UI", system-ui, sans-serif;
+      color: light-dark(#1f2430, #eceef2); background: light-dark(#fff, #1b1d22);
+    }
+    .err b { display: block; font-size: 15px; margin-bottom: 6px; }
+    .err code { background: light-dark(#f3f3f6, #2a2d34); padding: 1px 5px; border-radius: 5px; }
+    .err__why {
+      display: block; margin: 10px 0 0; padding: 8px 10px; border-radius: 10px; font-size: 12px;
+      background: light-dark(#f3f3f6, #2a2d34); color: light-dark(#5b6070, #b9bec9); word-break: break-word;
+    }
+    .err__row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .err button {
+      font: inherit; font-weight: 600; padding: 8px 16px; border-radius: 999px; border: none;
+      cursor: pointer; background: #c2242c; color: #fff;
+    }
+    .err button.ghost {
+      background: transparent; color: light-dark(#1f2430, #eceef2);
+      border: 1px solid light-dark(#e0e0e6, #3a3d45);
+    }
+  </style>
+</head>
+<body>
+  <iframe id="widget" title="Чат поддержки Портала поставщиков" allow="microphone"></iframe>
+  <div class="err" id="err">
+    <b>Сервер Валерчика не отвечает</b>
+    Проверьте адрес в настройках расширения (сейчас: <code id="addr"></code>) и что стек запущен:
+    <code>.\start.ps1</code> либо <code>cd backend &amp;&amp; uv run uvicorn app.main:app --port 8090</code>.
+    <span class="err__why" id="why"></span>
+    <span class="err__row">
+      <button type="button" id="retry">Проверить ещё раз</button>
+      <button type="button" class="ghost" id="anyway">Всё равно открыть чат</button>
+    </span>
+  </div>
+  <!-- lib.js первым: из него берутся адреса портала для проверки postMessage -->
+  <script src="content/lib.js"></script>
+  <script src="chat-frame.js"></script>
+</body>
+</html>

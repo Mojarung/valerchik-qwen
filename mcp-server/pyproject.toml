@@ -1,0 +1,18 @@
+[project]
+name = "valerchik-mcp"
+version = "1.0.0"
+description = "MCP-сервер: тулы чата поддержки «Валерчик» для ИИ-агентов (Claude и др.)"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=2.0",
+    "httpx>=0.28",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

@@ -1,0 +1,100 @@
+{
+  "manifest_version": 3,
+  "name": "Валерчик — помощник Портала поставщиков",
+  "short_name": "Валерчик",
+  "version": "1.0.0",
+  "description": "ИИ-поддержка zakupki.mos.ru: отвечает по базе знаний и показывает по шагам, куда нажимать, прямо на портале.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Валерчик: открыть чат поддержки",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false
+  },
+  "permissions": [
+    "storage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "host_permissions": [
+    "https://zakupki.mos.ru/*",
+    "https://old.zakupki.mos.ru/*",
+    "https://201-24-127-126.sslip.io/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://zakupki.mos.ru/*",
+        "https://old.zakupki.mos.ru/*"
+      ],
+      "js": [
+        "content/history-hook.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://zakupki.mos.ru/*",
+        "https://old.zakupki.mos.ru/*"
+      ],
+      "js": [
+        "content/lib.js",
+        "content/styles.js",
+        "content/mascot.js",
+        "content/guide.js",
+        "content/recorder.js",
+        "content/chat.js",
+        "content/main.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "chat.html",
+        "chat-frame.js",
+        "content/lib.js",
+        "widget/*"
+      ],
+      "matches": [
+        "https://zakupki.mos.ru/*",
+        "https://old.zakupki.mos.ru/*"
+      ]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "valerchik@zakupki-support-ai",
+      "strict_min_version": "121.0"
+    }
+  }
+}
