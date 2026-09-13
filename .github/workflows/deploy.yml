@@ -1,0 +1,52 @@
+name: Deploy
+
+# Автодеплой: каждый пуш в main выкатывается на сервер.
+# Runner забирает код, rsync'ом кладёт его в /opt/valerchik и запускает там
+# valerchik-deploy (docker compose up -d --build). Серверу доступ к GitHub не нужен.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Два пуша подряд не должны собирать стек одновременно: второй ждёт первый.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to server
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SSH-доступ к серверу
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_KEY" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ]; then
+            echo "Секреты DEPLOY_HOST/DEPLOY_USER/DEPLOY_KEY/DEPLOY_KNOWN_HOSTS заданы не все — деплой остановлен." >&2
+            exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          # known_hosts из секрета, а не доверие первому подключению: иначе MITM подменит хост незаметно.
+          echo "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          echo "TARGET=$DEPLOY_USER@$DEPLOY_HOST" >> "$GITHUB_ENV"
+
+      - name: Код на сервер
+        # .env и backups/ живут только на сервере — их не трогаем и не удаляем.
+        run: |
+          rsync -az --delete \
+            --exclude .git --exclude .env --exclude backups/ --exclude data/ \
+            -e "ssh -o StrictHostKeyChecking=yes" \
+            ./ "$TARGET:/opt/valerchik/"
+
+      - name: Пересборка стека
+        run: |
+          ssh -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 "$TARGET" \
+            "SHA=$GITHUB_SHA valerchik-deploy"

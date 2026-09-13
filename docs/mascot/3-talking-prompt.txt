@@ -1,0 +1,8 @@
+Картинка: 3-talking.png | Длительность: 5 сек | Бесшовный цикл: да
+Назначение: состояние «отвечает пользователю» (стриминг ответа)
+
+EN:
+cute chibi grey rat in a headset talks cheerfully into the microphone, mouth moving, one paw gesturing as if explaining, friendly smile, occasional nod, ears bounce slightly, static camera, plain white background, consistent 2D cartoon sticker style, seamless loop
+
+RU:
+крыска в гарнитуре радостно говорит в микрофон, ротик двигается, одной лапкой жестикулирует, будто объясняет, дружелюбная улыбка, кивает, статичная камера, белый фон, бесшовный цикл

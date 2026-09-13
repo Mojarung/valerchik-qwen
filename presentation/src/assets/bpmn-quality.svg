@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1918 244" width="1918" height="244" font-family="Segoe UI, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3c4048"/></marker></defs>
+<rect width="1918" height="244" fill="#ffffff"/>
+<rect x="30" y="0" width="1888" height="122" fill="#f7f7fa" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="0" width="30" height="122" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="61.0" transform="rotate(-90 15.0 61.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Администратор</text>
+<rect x="30" y="122" width="1888" height="122" fill="#ffffff" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="122" width="30" height="122" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="183.0" transform="rotate(-90 15.0 183.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Система</text>
+<path d="M148 61 L204 61 L204 183 L260 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M420 183 L470 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M630 183 L680 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M840 183 L890 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1050 183 L1100 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1260 183 L1365 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1415 183 L1468 183 L1468 61 L1520 61" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1456.7" y="105.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1467.5" y="116.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<path d="M1680 61 L1758 61 L1758 183 L1792 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1415 183 L1792 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1589.3" y="166.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1603.5" y="177.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<circle cx="130" cy="61" r="18.0" fill="#ffffff" stroke="#2f8f5b" stroke-width="2"/>
+<text x="130" y="93" text-anchor="middle" font-size="11" fill="#1f2430">Отчёт по</text>
+<text x="130" y="106" text-anchor="middle" font-size="11" fill="#1f2430">расписанию или по</text>
+<text x="130" y="119" text-anchor="middle" font-size="11" fill="#1f2430">кнопке</text>
+<rect x="260" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="340" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Собрать отзывы и</text>
+<text x="340" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">оценки за период</text>
+<rect x="470" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="550" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Определить тональность</text>
+<text x="550" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">комментариев</text>
+<rect x="680" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="760" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Сгруппировать негатив</text>
+<text x="760" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">по эмбеддингам</text>
+<rect x="890" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="970" y="169" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Посчитать рейтинг</text>
+<text x="970" y="183" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">специалистов, включая</text>
+<text x="970" y="197" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">ИИ</text>
+<rect x="1100" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1180" y="169" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Сформировать</text>
+<text x="1180" y="183" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">содержательное</text>
+<text x="1180" y="197" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">заключение</text>
+<path d="M1390.0 158.0 L1415.0 183.0 L1390.0 208.0 L1365.0 183.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M1381.0 174.0 L1399.0 192.0 M1399.0 174.0 L1381.0 192.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="1390" y="137" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Найдены системные</text>
+<text x="1390" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">проблемы?</text>
+<rect x="1520" y="24" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1600" y="54" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Пополнить базу знаний</text>
+<text x="1600" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">и обучение операторов</text>
+<circle cx="1810" cy="183" r="18.0" fill="#ffffff" stroke="#c2242c" stroke-width="4"/>
+<text x="1810" y="215" text-anchor="middle" font-size="11" fill="#1f2430">Отчёт в админ-</text>
+<text x="1810" y="228" text-anchor="middle" font-size="11" fill="#1f2430">панели</text>
+</svg>

@@ -1,0 +1,8 @@
+Картинка: 1-neutral.png | Длительность: 5 сек | Бесшовный цикл: да
+Назначение: idle-состояние в шапке чата
+
+EN:
+cute chibi grey rat mascot in a call-center headset sits calmly, gentle breathing, slow blinking of huge glossy eyes, ears twitch slightly, long pink tail sways softly, subtle idle animation, static camera, plain white background, consistent 2D cartoon sticker style, smooth squash-and-stretch, seamless loop, no text
+
+RU:
+милая крыска в гарнитуре сидит спокойно, мягко дышит, медленно моргает большими блестящими глазами, ушки слегка подрагивают, розовый хвост плавно покачивается, статичная камера, белый фон, бесшовный цикл

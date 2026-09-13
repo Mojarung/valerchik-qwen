@@ -1,0 +1,8 @@
+# В образ копируются только pyproject.toml, uv.lock и сам сервер. Локальное
+# окружение и кэши в контекст сборки не нужны.
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+test_*.py
+.env

@@ -1,0 +1,9 @@
+{
+  "name": "valerchik-openapi-types",
+  "private": true,
+  "description": "Генератор TS-типов из схемы API. Отдельный пакет: openapi-typescript работает через JS-API TypeScript 5, а фронт собирается на TypeScript 7, у которого такого API нет.",
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

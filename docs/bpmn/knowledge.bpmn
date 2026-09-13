@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://tenderhack.ru/valerchik">
+  <bpmn:collaboration id="Collab_Knowledge">
+    <bpmn:participant id="Participant_Knowledge" name="Структурирование неформализованной базы знаний" processRef="Process_Knowledge" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Knowledge" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Knowledge">
+      <bpmn:lane id="Lane_0" name="Администратор">
+        <bpmn:flowNodeRef>StartUpload</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Review</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_1" name="Система">
+        <bpmn:flowNodeRef>Parse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwTable</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>DirectImport</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Split</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>MakeQuestion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>LinkImages</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ClassifyLine</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Index</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GwPublish</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Draft</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndReady</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartUpload" name="Загружена методичка или регламент"><bpmn:documentation>pdf, docx, xlsx, xls, pptx, html, md, txt.</bpmn:documentation><bpmn:outgoing>Flow_0</bpmn:outgoing></bpmn:startEvent>
+    <bpmn:task id="Parse" name="Разобрать документ, извлечь текст и иллюстрации"><bpmn:incoming>Flow_0</bpmn:incoming><bpmn:outgoing>Flow_1</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwTable" name="Это готовая выгрузка «вопрос — ответ»?"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing><bpmn:outgoing>Flow_4</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:task id="DirectImport" name="Импортировать пары напрямую"><bpmn:incoming>Flow_2</bpmn:incoming><bpmn:outgoing>Flow_3</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Split" name="Нарезать по заголовкам и абзацам"><bpmn:incoming>Flow_4</bpmn:incoming><bpmn:outgoing>Flow_5</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="MakeQuestion" name="Сформулировать вопрос к каждому фрагменту"><bpmn:documentation>LLM формулирует вопрос, который фрагмент закрывает.</bpmn:documentation><bpmn:incoming>Flow_5</bpmn:incoming><bpmn:outgoing>Flow_6</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="LinkImages" name="Привязать иллюстрации по авторской нумерации"><bpmn:documentation>«нажмите (Рисунок 26 (2))» — связь берётся из текста, а не угадывается.</bpmn:documentation><bpmn:incoming>Flow_6</bpmn:incoming><bpmn:outgoing>Flow_7</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="ClassifyLine" name="Определить линию поддержки и категорию"><bpmn:incoming>Flow_3</bpmn:incoming><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:outgoing>Flow_8</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Index" name="Проиндексировать: blue/green через алиасы Qdrant"><bpmn:documentation>Поиск не прерывается: алиас переключается на готовую коллекцию.</bpmn:documentation><bpmn:incoming>Flow_8</bpmn:incoming><bpmn:outgoing>Flow_9</bpmn:outgoing></bpmn:task>
+    <bpmn:exclusiveGateway id="GwPublish" name="Публиковать сразу?"><bpmn:incoming>Flow_9</bpmn:incoming><bpmn:outgoing>Flow_10</bpmn:outgoing><bpmn:outgoing>Flow_13</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:task id="Draft" name="Оставить черновиком"><bpmn:incoming>Flow_10</bpmn:incoming><bpmn:outgoing>Flow_11</bpmn:outgoing></bpmn:task>
+    <bpmn:task id="Review" name="Проверить и опубликовать"><bpmn:incoming>Flow_11</bpmn:incoming><bpmn:outgoing>Flow_12</bpmn:outgoing></bpmn:task>
+    <bpmn:endEvent id="EndReady" name="База знаний обновлена без простоя"><bpmn:incoming>Flow_12</bpmn:incoming><bpmn:incoming>Flow_13</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0" sourceRef="StartUpload" targetRef="Parse" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Parse" targetRef="GwTable" />
+    <bpmn:sequenceFlow id="Flow_2" name="да" sourceRef="GwTable" targetRef="DirectImport" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="DirectImport" targetRef="ClassifyLine" />
+    <bpmn:sequenceFlow id="Flow_4" name="нет" sourceRef="GwTable" targetRef="Split" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Split" targetRef="MakeQuestion" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="MakeQuestion" targetRef="LinkImages" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="LinkImages" targetRef="ClassifyLine" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="ClassifyLine" targetRef="Index" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Index" targetRef="GwPublish" />
+    <bpmn:sequenceFlow id="Flow_10" name="нет" sourceRef="GwPublish" targetRef="Draft" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Draft" targetRef="Review" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Review" targetRef="EndReady" />
+    <bpmn:sequenceFlow id="Flow_13" name="да" sourceRef="GwPublish" targetRef="EndReady" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Knowledge">
+    <bpmndi:BPMNPlane id="Plane_Knowledge" bpmnElement="Collab_Knowledge">
+      <bpmndi:BPMNShape id="Shape_Participant_Knowledge" bpmnElement="Participant_Knowledge" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="2338" height="354" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_0" bpmnElement="Lane_0" isHorizontal="true">
+        <dc:Bounds x="30" y="0" width="2308" height="122" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_1" bpmnElement="Lane_1" isHorizontal="true">
+        <dc:Bounds x="30" y="122" width="2308" height="232" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StartUpload" bpmnElement="StartUpload">
+        <dc:Bounds x="112" y="43" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Parse" bpmnElement="Parse">
+        <dc:Bounds x="260" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwTable" bpmnElement="GwTable">
+        <dc:Bounds x="525" y="158" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DirectImport" bpmnElement="DirectImport">
+        <dc:Bounds x="680" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Split" bpmnElement="Split">
+        <dc:Bounds x="680" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_MakeQuestion" bpmnElement="MakeQuestion">
+        <dc:Bounds x="890" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LinkImages" bpmnElement="LinkImages">
+        <dc:Bounds x="1100" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ClassifyLine" bpmnElement="ClassifyLine">
+        <dc:Bounds x="1310" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Index" bpmnElement="Index">
+        <dc:Bounds x="1520" y="146" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GwPublish" bpmnElement="GwPublish">
+        <dc:Bounds x="1785" y="158" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Draft" bpmnElement="Draft">
+        <dc:Bounds x="1730" y="256" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Review" bpmnElement="Review">
+        <dc:Bounds x="1940" y="24" width="160" height="74" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndReady" bpmnElement="EndReady">
+        <dc:Bounds x="2212" y="165" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_0" bpmnElement="Flow_0">
+        <di:waypoint x="148" y="61" />
+        <di:waypoint x="204" y="61" />
+        <di:waypoint x="204" y="183" />
+        <di:waypoint x="260" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_1" bpmnElement="Flow_1">
+        <di:waypoint x="420" y="183" />
+        <di:waypoint x="525" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_2" bpmnElement="Flow_2">
+        <di:waypoint x="550" y="208" />
+        <di:waypoint x="550" y="293" />
+        <di:waypoint x="680" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_3" bpmnElement="Flow_3">
+        <di:waypoint x="840" y="293" />
+        <di:waypoint x="1276" y="293" />
+        <di:waypoint x="1276" y="183" />
+        <di:waypoint x="1310" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_4" bpmnElement="Flow_4">
+        <di:waypoint x="575" y="183" />
+        <di:waypoint x="680" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_5" bpmnElement="Flow_5">
+        <di:waypoint x="840" y="183" />
+        <di:waypoint x="890" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_6" bpmnElement="Flow_6">
+        <di:waypoint x="1050" y="183" />
+        <di:waypoint x="1100" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_7" bpmnElement="Flow_7">
+        <di:waypoint x="1260" y="183" />
+        <di:waypoint x="1310" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_8" bpmnElement="Flow_8">
+        <di:waypoint x="1470" y="183" />
+        <di:waypoint x="1520" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_9" bpmnElement="Flow_9">
+        <di:waypoint x="1680" y="183" />
+        <di:waypoint x="1785" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_10" bpmnElement="Flow_10">
+        <di:waypoint x="1810" y="208" />
+        <di:waypoint x="1810" y="256" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_11" bpmnElement="Flow_11">
+        <di:waypoint x="1890" y="293" />
+        <di:waypoint x="1915" y="293" />
+        <di:waypoint x="1915" y="61" />
+        <di:waypoint x="1940" y="61" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_12" bpmnElement="Flow_12">
+        <di:waypoint x="2100" y="61" />
+        <di:waypoint x="2156" y="61" />
+        <di:waypoint x="2156" y="183" />
+        <di:waypoint x="2212" y="183" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_13" bpmnElement="Flow_13">
+        <di:waypoint x="1835" y="183" />
+        <di:waypoint x="2212" y="183" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

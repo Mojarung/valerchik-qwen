@@ -1,0 +1,6 @@
+# Скрипты уезжают в linux-контейнеры (backup-loop.sh монтируется прямо внутрь),
+# а на Windows core.autocrlf=true превращает их в CRLF — busybox ash тогда
+# спотыкается на первой же строке: "set: illegal option -".
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf

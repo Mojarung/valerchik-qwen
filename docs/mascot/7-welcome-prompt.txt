@@ -1,0 +1,8 @@
+Картинка: 1-neutral.png (или 3-talking.png) | Длительность: 5 сек | Бесшовный цикл: да
+Назначение: приветствие на hero-экране чата и странице логина
+
+EN:
+cute chibi grey rat in a headset waves its paw at the camera in greeting, friendly wink, slight head tilt, ears perk up, tail curls happily, welcoming smile, static camera, plain white background, consistent 2D cartoon sticker style, seamless loop, no text
+
+RU:
+крыска в гарнитуре приветливо машет лапкой в камеру, дружелюбно подмигивает, слегка наклоняет голову, ушки торчком, хвостик радостно изгибается, статичная камера, белый фон, бесшовный цикл

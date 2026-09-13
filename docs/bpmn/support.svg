@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4018 696" width="4018" height="696" font-family="Segoe UI, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3c4048"/></marker></defs>
+<rect width="4018" height="696" fill="#ffffff"/>
+<rect x="30" y="0" width="3988" height="232" fill="#f7f7fa" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="0" width="30" height="232" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="116.0" transform="rotate(-90 15.0 116.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Пользователь</text>
+<rect x="30" y="232" width="3988" height="232" fill="#ffffff" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="232" width="30" height="232" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="348.0" transform="rotate(-90 15.0 348.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Валерчик (ИИ-агент)</text>
+<rect x="30" y="464" width="3988" height="232" fill="#f7f7fa" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="464" width="30" height="232" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="580.0" transform="rotate(-90 15.0 580.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Оператор поддержки</text>
+<path d="M148 61 L204 61 L204 293 L260 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M420 293 L525 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M550 318 L550 366" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="539.2" y="325.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="550.0" y="336.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<path d="M630 403 L742 403" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M575 293 L680 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="613.3" y="276.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="627.5" y="287.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<path d="M840 293 L890 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1050 293 L1155 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1180 318 L1180 366" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1165.8" y="325.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1180.0" y="336.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<path d="M1260 403 L1310 403" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1205 293 L1365 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1274.2" y="276.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1285.0" y="287.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<path d="M1390 318 L1390 403 L1520 403" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1375.8" y="386.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1390.0" y="397.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<path d="M1600 440 L1600 452 L970 452 L970 330" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1415 293 L1520 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1456.7" y="276.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1467.5" y="287.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<path d="M1680 293 L1705 293 L1705 61 L1730 61" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1890 61 L1942 61 L1942 293 L1995 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2045 293 L2128 293 L2128 61 L2212 61" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="2117.7" y="160.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="2128.5" y="171.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<path d="M2045 293 L2150 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="2083.3" y="276.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="2097.5" y="287.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<path d="M1470 403 L2116 403 L2116 293 L2150 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="2064.4" y="331.0" width="103.2" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="2116.0" y="342.0" text-anchor="middle" font-size="11" fill="#6b7280">нужен оператор</text>
+<path d="M2310 293 L2360 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2520 293 L2570 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2730 293 L2755 293 L2755 525 L2780 525" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2908 580 L2908 635 L2780 635" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2860 672 L2860 684 L2650 684 L2650 330" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2940 525 L2990 525" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M3150 525 L3200 525" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M3360 525 L3410 525" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M3570 525 L3622 525 L3622 61 L3675 61" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M3725 61 L3892 61" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="3780.7" y="44.0" width="55.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="3808.5" y="55.0" text-anchor="middle" font-size="11" fill="#6b7280">Помогло</text>
+<path d="M3700 86 L3700 684 L3070 684 L3070 562" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="3350.4" y="667.0" width="69.19999999999999" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="3385.0" y="678.0" text-anchor="middle" font-size="11" fill="#6b7280">Не решено</text>
+<circle cx="130" cy="61" r="18.0" fill="#ffffff" stroke="#2f8f5b" stroke-width="2"/>
+<text x="130" y="93" text-anchor="middle" font-size="11" fill="#1f2430">Пользователь задал</text>
+<text x="130" y="106" text-anchor="middle" font-size="11" fill="#1f2430">вопрос</text>
+<rect x="260" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="340" y="286" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Проверить сообщение на</text>
+<text x="340" y="300" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">нецензурную лексику</text>
+<path d="M550.0 268.0 L575.0 293.0 L550.0 318.0 L525.0 293.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M541.0 284.0 L559.0 302.0 M559.0 284.0 L541.0 302.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="550" y="247" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Нарушение правил</text>
+<text x="550" y="260" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">общения?</text>
+<rect x="470" y="366" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="550" y="396" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Уведомить о нарушении</text>
+<text x="550" y="410" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">и завершить обращение</text>
+<circle cx="760" cy="403" r="18.0" fill="#ffffff" stroke="#c2242c" stroke-width="4"/>
+<text x="760" y="435" text-anchor="middle" font-size="11" fill="#1f2430">Обращение закрыто</text>
+<text x="760" y="448" text-anchor="middle" font-size="11" fill="#1f2430">по правилам</text>
+<text x="760" y="461" text-anchor="middle" font-size="11" fill="#1f2430">общения</text>
+<rect x="680" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="760" y="279" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Восстановить</text>
+<text x="760" y="293" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">раскладку, учесть</text>
+<text x="760" y="307" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">раздел портала</text>
+<rect x="890" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="970" y="279" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Найти ответ в базе</text>
+<text x="970" y="293" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">знаний: вектор + BM25</text>
+<text x="970" y="307" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">+ RRF</text>
+<path d="M1180.0 268.0 L1205.0 293.0 L1180.0 318.0 L1155.0 293.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M1171.0 284.0 L1189.0 302.0 M1189.0 284.0 L1171.0 302.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="1180" y="247" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Уверенность выше</text>
+<text x="1180" y="260" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">порога?</text>
+<rect x="1100" y="366" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1180" y="396" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Зафиксировать вопрос</text>
+<text x="1180" y="410" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">как пробел базы знаний</text>
+<rect x="1310" y="366" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1390" y="389" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Сообщить, что ответа</text>
+<text x="1390" y="403" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">нет, и предложить</text>
+<text x="1390" y="417" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">оператора</text>
+<path d="M1390.0 268.0 L1415.0 293.0 L1390.0 318.0 L1365.0 293.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M1381.0 284.0 L1399.0 302.0 M1399.0 284.0 L1381.0 302.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="1390" y="247" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Тема определяется</text>
+<text x="1390" y="260" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">однозначно?</text>
+<rect x="1520" y="366" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1600" y="396" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Задать уточняющий</text>
+<text x="1600" y="410" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">вопрос</text>
+<rect x="1520" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1600" y="286" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Ответить с источниками</text>
+<text x="1600" y="300" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">и уверенностью</text>
+<rect x="1730" y="24" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1810" y="61" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Оценить ответ</text>
+<path d="M2020.0 268.0 L2045.0 293.0 L2020.0 318.0 L1995.0 293.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M2011.0 284.0 L2029.0 302.0 M2029.0 284.0 L2011.0 302.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="2020" y="260" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Ответ помог?</text>
+<circle cx="2230" cy="61" r="18.0" fill="#ffffff" stroke="#c2242c" stroke-width="4"/>
+<text x="2230" y="93" text-anchor="middle" font-size="11" fill="#1f2430">Решено без</text>
+<text x="2230" y="106" text-anchor="middle" font-size="11" fill="#1f2430">оператора</text>
+<rect x="2150" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="2230" y="286" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Определить линию</text>
+<text x="2230" y="300" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">поддержки</text>
+<rect x="2360" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="2440" y="286" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Поставить обращение в</text>
+<text x="2440" y="300" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">очередь линии</text>
+<rect x="2570" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="2650" y="279" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Назначить свободному</text>
+<text x="2650" y="293" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">сотруднику с</text>
+<text x="2650" y="307" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">минимальной нагрузкой</text>
+<rect x="2780" y="488" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="2860" y="525" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Принять назначение</text>
+<circle cx="2908" cy="562" r="18.0" fill="#ffffff" stroke="#1f2430" stroke-width="2"/>
+<circle cx="2908" cy="562" r="14.0" fill="none" stroke="#1f2430" stroke-width="1.4"/>
+<path d="M2907.6 555.0 L2907.6 562.0 L2913.6 565.0" fill="none" stroke="#1f2430" stroke-width="1.8"/>
+<text x="2908" y="594" text-anchor="middle" font-size="11" fill="#1f2430">60 секунд</text>
+<rect x="2780" y="598" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="2860" y="621" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Вернуть в очередь без</text>
+<text x="2860" y="635" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">сброса времени</text>
+<text x="2860" y="649" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">ожидания</text>
+<rect x="2990" y="488" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="3070" y="518" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Сводка, проверки,</text>
+<text x="3070" y="532" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">источники и черновик</text>
+<rect x="3200" y="488" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="3280" y="518" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Ответить или запросить</text>
+<text x="3280" y="532" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">сведения</text>
+<rect x="3410" y="488" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="3490" y="525" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Предложить решение</text>
+<path d="M3700.0 36.0 L3725.0 61.0 L3700.0 86.0 L3675.0 61.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M3691.0 52.0 L3709.0 70.0 M3709.0 52.0 L3691.0 70.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="3700" y="15" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Пользователь</text>
+<text x="3700" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">подтвердил решение?</text>
+<circle cx="3910" cy="61" r="18.0" fill="#ffffff" stroke="#c2242c" stroke-width="4"/>
+<text x="3910" y="93" text-anchor="middle" font-size="11" fill="#1f2430">Решение</text>
+<text x="3910" y="106" text-anchor="middle" font-size="11" fill="#1f2430">подтверждено</text>
+</svg>

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2338 354" width="2338" height="354" font-family="Segoe UI, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3c4048"/></marker></defs>
+<rect width="2338" height="354" fill="#ffffff"/>
+<rect x="30" y="0" width="2308" height="122" fill="#f7f7fa" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="0" width="30" height="122" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="61.0" transform="rotate(-90 15.0 61.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Администратор</text>
+<rect x="30" y="122" width="2308" height="232" fill="#ffffff" stroke="#3c4048" stroke-width="1"/>
+<rect x="0" y="122" width="30" height="232" fill="#eceef3" stroke="#3c4048" stroke-width="1"/>
+<text x="15.0" y="238.0" transform="rotate(-90 15.0 238.0)" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2430">Система</text>
+<path d="M148 61 L204 61 L204 183 L260 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M420 183 L525 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M550 208 L550 293 L680 293" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="539.2" y="276.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="550.0" y="287.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<path d="M840 293 L1276 293 L1276 183 L1310 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M575 183 L680 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="613.3" y="166.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="627.5" y="177.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<path d="M840 183 L890 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1050 183 L1100 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1260 183 L1310 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1470 183 L1520 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1680 183 L1785 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1810 208 L1810 256" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="1795.8" y="215.0" width="28.4" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="1810.0" y="226.0" text-anchor="middle" font-size="11" fill="#6b7280">нет</text>
+<path d="M1890 293 L1915 293 L1915 61 L1940 61" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M2100 61 L2156 61 L2156 183 L2212 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1835 183 L2212 183" fill="none" stroke="#3c4048" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="2012.7" y="166.0" width="21.6" height="14" fill="#ffffff" opacity="0.92"/>
+<text x="2023.5" y="177.0" text-anchor="middle" font-size="11" fill="#6b7280">да</text>
+<circle cx="130" cy="61" r="18.0" fill="#ffffff" stroke="#2f8f5b" stroke-width="2"/>
+<text x="130" y="93" text-anchor="middle" font-size="11" fill="#1f2430">Загружена</text>
+<text x="130" y="106" text-anchor="middle" font-size="11" fill="#1f2430">методичка или</text>
+<text x="130" y="119" text-anchor="middle" font-size="11" fill="#1f2430">регламент</text>
+<rect x="260" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="340" y="169" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Разобрать документ,</text>
+<text x="340" y="183" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">извлечь текст и</text>
+<text x="340" y="197" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">иллюстрации</text>
+<path d="M550.0 158.0 L575.0 183.0 L550.0 208.0 L525.0 183.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M541.0 174.0 L559.0 192.0 M559.0 174.0 L541.0 192.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="550" y="137" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Это готовая выгрузка</text>
+<text x="550" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">«вопрос — ответ»?</text>
+<rect x="680" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="760" y="286" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Импортировать пары</text>
+<text x="760" y="300" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">напрямую</text>
+<rect x="680" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="760" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Нарезать по заголовкам</text>
+<text x="760" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">и абзацам</text>
+<rect x="890" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="970" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Сформулировать вопрос</text>
+<text x="970" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">к каждому фрагменту</text>
+<rect x="1100" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1180" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Привязать иллюстрации</text>
+<text x="1180" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">по авторской нумерации</text>
+<rect x="1310" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1390" y="176" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Определить линию</text>
+<text x="1390" y="190" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">поддержки и категорию</text>
+<rect x="1520" y="146" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1600" y="169" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Проиндексировать:</text>
+<text x="1600" y="183" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">blue/green через</text>
+<text x="1600" y="197" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">алиасы Qdrant</text>
+<path d="M1810.0 158.0 L1835.0 183.0 L1810.0 208.0 L1785.0 183.0 z" fill="#f4b73f" stroke="#3c4048" stroke-width="1.6"/>
+<path d="M1801.0 174.0 L1819.0 192.0 M1819.0 174.0 L1801.0 192.0" stroke="#1f2430" stroke-width="2.4"/>
+<text x="1810" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2430">Публиковать сразу?</text>
+<rect x="1730" y="256" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="1810" y="293" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Оставить черновиком</text>
+<rect x="1940" y="24" width="160" height="74" rx="10" fill="#ffffff" stroke="#2f6f4f" stroke-width="1.6"/>
+<text x="2020" y="54" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">Проверить и</text>
+<text x="2020" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="#1f2430">опубликовать</text>
+<circle cx="2230" cy="183" r="18.0" fill="#ffffff" stroke="#c2242c" stroke-width="4"/>
+<text x="2230" y="215" text-anchor="middle" font-size="11" fill="#1f2430">База знаний</text>
+<text x="2230" y="228" text-anchor="middle" font-size="11" fill="#1f2430">обновлена без</text>
+<text x="2230" y="241" text-anchor="middle" font-size="11" fill="#1f2430">простоя</text>
+</svg>

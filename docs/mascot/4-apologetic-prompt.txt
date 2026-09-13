@@ -1,0 +1,8 @@
+Картинка: 4-apologetic.png | Длительность: 5 сек | Бесшовный цикл: нет
+Назначение: состояние «в базе знаний нет ответа» (извиняется)
+
+EN:
+cute chibi grey rat in a headset looks sad and apologetic, ears droop down slowly, big glossy eyes look down, small sigh, paws folded together shyly, tail lies still, static camera, plain white background, consistent 2D cartoon sticker style, gentle slow animation, no text
+
+RU:
+крыска в гарнитуре грустно извиняется: ушки медленно опускаются, большие глаза смотрят вниз, лёгкий вздох, лапки виновато сложены, хвостик неподвижен, статичная камера, белый фон, медленная мягкая анимация

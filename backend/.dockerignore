@@ -1,0 +1,14 @@
+# В образ копируются только pyproject.toml, uv.lock и app/. Список держит
+# контекст сборки маленьким: локальное окружение, кэши линтеров и данные
+# lite-стенда иначе уходили демону при каждой сборке.
+.venv
+**/__pycache__
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.coverage
+coverage.xml
+htmlcov
+data
+tests
+.env

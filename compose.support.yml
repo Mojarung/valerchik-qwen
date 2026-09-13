@@ -1,0 +1,72 @@
+name: supportflow
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: supportflow-postgres
+    environment:
+      POSTGRES_USER: support
+      POSTGRES_DB: support
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes: ["pgdata:/var/lib/postgresql"]
+    ports: ["127.0.0.1:15439:5432"]
+  redis:
+    image: redis:8-alpine
+    container_name: supportflow-redis
+  qdrant:
+    image: qdrant/qdrant:v1.19.0
+    container_name: supportflow-qdrant
+    volumes: ["qdrant_data:/qdrant/storage"]
+    ports: ["127.0.0.1:16339:6333"]
+  api:
+    image: ghcr.io/mojarung/tender_hack_nijniy_2026-api:latest
+    container_name: supportflow-api
+    env_file: .env.support.local
+    environment:
+      APP_MODE: full
+      ALLOWED_ORIGINS: http://127.0.0.1:8099,http://localhost:8099
+      DATA_DIR: /data
+      DATABASE_URL: postgresql+asyncpg://support:${POSTGRES_PASSWORD}@supportflow-postgres:5432/support
+      REDIS_URL: redis://supportflow-redis:6379/0
+      QDRANT_URL: http://supportflow-qdrant:6333
+      TEI_URL: http://valerchik_tei_1:80
+      TEI_RERANK_URL: ""
+      TOXICITY_URL: ""
+      SEED_ON_STARTUP: "false"
+      ZAKUPKI_MCP_URL: ""
+    volumes:
+      - ./backend/app:/app/app:ro
+      - app_data:/data
+    ports: ["127.0.0.1:18009:8000"]
+    networks: [default, embeddings]
+  frontend:
+    image: ghcr.io/mojarung/tender_hack_nijniy_2026-frontend:latest
+    container_name: supportflow-frontend
+    volumes: ["./frontend/dist:/usr/share/nginx/html:ro"]
+    ports: ["127.0.0.1:8099:8080"]
+  evaluator:
+    profiles: [evaluation]
+    image: ghcr.io/mojarung/tender_hack_nijniy_2026-api:latest
+    env_file: [.env.support.local, .env.support-eval.local]
+    environment:
+      APP_MODE: full
+      DATA_DIR: /tmp/support-eval
+      DATABASE_URL: postgresql+asyncpg://support:${POSTGRES_PASSWORD}@supportflow-postgres:5432/support
+      REDIS_URL: redis://supportflow-redis:6379/0
+      QDRANT_URL: http://supportflow-qdrant:6333
+      TEI_URL: http://valerchik_tei_1:80
+      SEED_ON_STARTUP: "false"
+      ZAKUPKI_MCP_URL: ""
+    volumes:
+      - ./backend/app:/app/app:ro
+      - ./reports:/reports
+    networks: [default, embeddings]
+    command: [python, -m, app.tools.support_live_eval, --output, /reports/support-live]
+volumes:
+  pgdata:
+  app_data:
+  qdrant_data:
+networks:
+  default: {}
+  embeddings:
+    external: true
+    name: valerchik_default

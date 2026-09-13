@@ -1,0 +1,361 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: oklch(54% 0.21 25);          /* фирменный красный mos-style */
+  --color-brand-dark: oklch(46% 0.19 25);
+  /* светлый конец брендового градиента: заливка живее плоского красного, но
+     выше по светлоте не уходит — белый текст на ней держит 4.5:1 */
+  --color-brand-lift: oklch(58% 0.2 25);
+  --color-brand-soft: oklch(96% 0.02 25);
+  --color-ink: oklch(21% 0.01 260);
+  --color-ink-soft: oklch(45% 0.01 260);
+  --color-surface: oklch(99% 0.002 260);
+  --color-surface-2: oklch(96.5% 0.004 260);
+  --color-line: oklch(90% 0.005 260);
+  --color-ok: oklch(60% 0.15 150);
+  --color-warn: oklch(70% 0.15 80);
+  --color-warn-soft: oklch(96% 0.03 80);
+  /* Текст и значки поверх поверхностей. Заливка (--color-brand и т. п.) несёт
+     белый текст, а цвет на фоне страницы — другая задача: в тёмной теме
+     заливке нужно быть темнее, а тексту светлее. Один токен на обе роли давал
+     белый на красном 3.7:1 при норме 4.5, а зелёный и янтарный текст на светлом
+     фоне — 3.8:1 и 2.6:1. */
+  --color-brand-ink: oklch(50% 0.2 25);
+  --color-ok-ink: oklch(45% 0.13 150);
+  --color-warn-ink: oklch(47% 0.11 70);
+  --color-on-warn: oklch(24% 0.05 70);
+  /* дымка на фоне страницы — тоже токен: в тёмной теме она своя */
+  --color-glow-brand: oklch(96% 0.02 25);
+  --color-glow-cool: oklch(97% 0.008 260);
+  --shadow-card: 0 2px 10px oklch(54% 0.21 25 / 0.05), 0 1px 3px oklch(30% 0.02 260 / 0.05);
+  --font-sans: "Inter Variable", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius-card: 1.5rem;
+  /* «слаймовые» пружинные кривые: быстрые, с мягким перелётом */
+  --ease-slime: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pop: pop 0.35s var(--ease-slime);
+  --animate-fade-up: fade-up 0.35s var(--ease-slime);
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.92) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ---- тёмная тема ----
+   Палитра описана один раз, ниже её только «включают». Тему на <html> ставит
+   инлайновый скрипт до первого кадра; медиазапрос — страховка на случай, когда
+   скрипты выключены, поэтому он не должен перебивать явный выбор светлой. */
+:root {
+  --d-brand: oklch(55% 0.19 25);        /* заливка под белым текстом: 4.8:1 */
+  --d-brand-lift: oklch(60% 0.18 25);
+  --d-brand-dark: oklch(50% 0.18 25);   /* нажатие темнее заливки, а не светлее */
+  --d-brand-ink: oklch(72% 0.16 25);    /* красный текст на тёмной поверхности */
+  --d-ok-ink: oklch(76% 0.14 150);
+  --d-warn-ink: oklch(82% 0.13 80);
+  --d-on-warn: oklch(22% 0.05 70);
+  --d-brand-soft: oklch(31% 0.06 25);
+  --d-ink: oklch(93% 0.006 260);
+  --d-ink-soft: oklch(68% 0.012 260);
+  --d-surface: oklch(22% 0.008 260);
+  --d-surface-2: oklch(18% 0.008 260);
+  --d-line: oklch(31% 0.01 260);
+  --d-ok: oklch(70% 0.15 150);
+  --d-warn: oklch(78% 0.14 80);
+  --d-warn-soft: oklch(30% 0.05 80);
+  --d-glow-brand: oklch(30% 0.05 25);
+  --d-glow-cool: oklch(26% 0.02 260);
+  /* на тёмном тень почти не видна — объём даёт подсветка верхней кромки */
+  --d-shadow: 0 2px 12px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(100% 0 0 / 0.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-brand: var(--d-brand);
+    --color-brand-dark: var(--d-brand-dark);
+    --color-brand-lift: var(--d-brand-lift);
+    --color-brand-soft: var(--d-brand-soft);
+    --color-ink: var(--d-ink);
+    --color-ink-soft: var(--d-ink-soft);
+    --color-surface: var(--d-surface);
+    --color-surface-2: var(--d-surface-2);
+    --color-line: var(--d-line);
+    --color-ok: var(--d-ok);
+    --color-warn: var(--d-warn);
+    --color-warn-soft: var(--d-warn-soft);
+    --color-brand-ink: var(--d-brand-ink);
+    --color-ok-ink: var(--d-ok-ink);
+    --color-warn-ink: var(--d-warn-ink);
+    --color-on-warn: var(--d-on-warn);
+    --color-glow-brand: var(--d-glow-brand);
+    --color-glow-cool: var(--d-glow-cool);
+    --shadow-card: var(--d-shadow);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-brand: var(--d-brand);
+  --color-brand-dark: var(--d-brand-dark);
+  --color-brand-lift: var(--d-brand-lift);
+  --color-brand-soft: var(--d-brand-soft);
+  --color-ink: var(--d-ink);
+  --color-ink-soft: var(--d-ink-soft);
+  --color-surface: var(--d-surface);
+  --color-surface-2: var(--d-surface-2);
+  --color-line: var(--d-line);
+  --color-ok: var(--d-ok);
+  --color-warn: var(--d-warn);
+  --color-brand-ink: var(--d-brand-ink);
+  --color-ok-ink: var(--d-ok-ink);
+  --color-warn-ink: var(--d-warn-ink);
+  --color-on-warn: var(--d-on-warn);
+  --color-glow-brand: var(--d-glow-brand);
+  --color-glow-cool: var(--d-glow-cool);
+  --shadow-card: var(--d-shadow);
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+html, body, #root { height: 100%; }
+body {
+  /* мягкая брендовая дымка сверху — не плоский фон */
+  background:
+    radial-gradient(1100px 520px at 85% -12%, var(--color-glow-brand), transparent 60%),
+    radial-gradient(900px 480px at -10% 110%, var(--color-glow-cool), transparent 55%),
+    var(--color-surface-2);
+  /* без background-attachment: fixed — страница и так не прокручивается (скролл внутри
+     ленты), а в Firefox фиксированный фон пересчитывается на каждый кадр анимаций */
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- переиспользуемые блоки ---- */
+@layer components {
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    /* в светлой теме — мягкая тень с брендовым подтоном (не чёрная),
+       в тёмной — глубокая тень плюс подсветка верхней кромки */
+    box-shadow: var(--shadow-card);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium
+      select-none cursor-pointer min-h-11 whitespace-nowrap touch-manipulation
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand)
+      disabled:opacity-45 disabled:pointer-events-none;
+    transition: transform 0.35s var(--ease-slime), background 0.15s ease, color 0.15s ease,
+      border-color 0.15s ease, box-shadow 0.2s ease;
+  }
+  .btn-primary {
+    background: var(--color-brand);
+    color: white;
+    box-shadow: 0 4px 14px oklch(54% 0.21 25 / 0.28);
+  }
+  /* без scale: госсервису достаточно подъёма и цвета, пружинный рост кнопки читался как игрушка */
+  .btn-primary:hover { background: var(--color-brand-dark); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost {
+    @apply border;
+    border-color: var(--color-line);
+    background: var(--color-surface);
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand-ink);
+    background: var(--color-brand-soft);
+    transform: translateY(-1px);
+  }
+  .btn-ghost:active { transform: translateY(0); }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium
+      cursor-pointer touch-manipulation
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand);
+    border-color: var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-ink-soft);
+    transition: transform 0.35s var(--ease-slime), background 0.15s ease, color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .chip:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand-ink);
+    background: var(--color-brand-soft);
+    /* без scale: увеличенный чип с длинным текстом вылезал за край ленты сообщений */
+    transform: translateY(-2px);
+  }
+  .chip:active { transform: scale(0.94); }
+  .input {
+    @apply w-full rounded-2xl border px-4 py-2.5 text-sm transition-colors
+      focus:outline-none;
+    border-color: var(--color-line);
+    background: var(--color-surface);
+  }
+  .input:focus { border-color: var(--color-brand); box-shadow: 0 0 0 4px oklch(54% 0.21 25 / 0.1); }
+  .label { @apply block text-xs font-semibold uppercase tracking-wide mb-1.5; color: var(--color-ink-soft); }
+  .checkbox {
+    @apply size-4 cursor-pointer align-middle
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand);
+    accent-color: var(--color-brand);
+  }
+  .checkbox:disabled { @apply cursor-not-allowed opacity-40; }
+}
+
+/* ---- кнопка отправки: выезд слева направо + расширение слота ---- */
+.send-slot {
+  display: grid;
+  grid-template-columns: 0fr;           /* слот схлопнут — кнопки не видно */
+  margin-left: 0;
+  transition: grid-template-columns 0.4s var(--ease-slime), margin-left 0.4s var(--ease-slime);
+}
+.send-slot--open {
+  grid-template-columns: 1fr;           /* слот раскрывается — композер «расширяется» */
+  margin-left: 0.375rem;
+}
+.send-slot .btn {
+  transform: translateX(-14px) scale(0.75);
+  opacity: 0;
+  box-shadow: none;  /* слот обрезает переполнение — тень всё равно срезалась бы по краю */
+  transition: transform 0.42s var(--ease-slime), opacity 0.22s ease, background 0.15s ease;
+  pointer-events: none;
+}
+.send-slot--open .btn {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.send-slot--open .btn:hover { transform: translateX(0) scale(1.08); }
+.send-slot--open .btn:active { transform: translateX(0) scale(0.88); }
+
+/* ремонтник скрыт до первого кадра анимации — дальше видимостью правит GSAP (autoAlpha) */
+.mascot-fixer { top: 0; left: 0; visibility: hidden; opacity: 0; }
+
+/* лайк/дизлайк под ответом — неброские, пока на них не навели */
+.rate-btn {
+  @apply inline-flex size-6 cursor-pointer items-center justify-center rounded-full border
+    focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--color-brand);
+  border-color: transparent;
+  color: var(--color-ink-soft);
+  transition: transform 0.25s var(--ease-slime), background 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+.rate-btn:hover {
+  border-color: var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-brand-ink);
+  transform: translateY(-1px) scale(1.1);
+}
+.rate-btn:active { transform: scale(0.9); }
+
+/* текст сообщения как отдельный слой — его размывает анимация починки раскладки */
+.bubble-text { display: inline-block; will-change: transform, filter, opacity; }
+
+/* ---- вспышка «починено»: пузырь после исправления раскладки ---- */
+.bubble-repaired { animation: bubble-repaired 0.9s var(--ease-out-soft); }
+@keyframes bubble-repaired {
+  0% { box-shadow: 0 0 0 0 oklch(60% 0.15 150 / 0.55); }
+  40% { box-shadow: 0 0 0 6px oklch(60% 0.15 150 / 0.22); }
+  100% { box-shadow: 0 0 0 10px oklch(60% 0.15 150 / 0); }
+}
+
+/* ---- «Валерчик печатает»: три точки в пузыре-заглушке ---- */
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-ink-soft);
+  animation: typing-dot 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+
+/* ---- markdown в сообщениях чата ---- */
+.md > * + * { margin-top: 0.5rem; }
+.md strong { font-weight: 700; }
+.md ul { list-style: disc; padding-left: 1.25rem; }
+.md ol { list-style: decimal; padding-left: 1.25rem; }
+.md li + li { margin-top: 0.2rem; }
+.md a { color: var(--color-brand-ink); text-decoration: underline; text-underline-offset: 2px; }
+.md code {
+  background: var(--color-surface-2);
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.875em;   /* не мельче 12px в пузыре 14px */
+}
+.md pre { background: var(--color-surface-2); border-radius: 0.6rem; padding: 0.6rem; overflow-x: auto; }
+.md pre code { background: none; padding: 0; }
+.md blockquote {
+  border-left: 3px solid var(--color-line);
+  padding-left: 0.75rem;
+  color: var(--color-ink-soft);
+}
+.md .md-scroll { overflow-x: auto; max-width: 100%; }
+/* Картинка из markdown-ответа: без потолка широкая растягивала пузырь вбок,
+   а высокая — на несколько экранов вниз */
+.md img { display: block; max-width: 100%; max-height: 20rem; width: auto; height: auto; object-fit: contain; border-radius: 0.6rem; }
+.md table { border-collapse: collapse; font-size: 0.875em; }
+.md th, .md td { border: 1px solid var(--color-line); padding: 0.3rem 0.55rem; text-align: left; }
+.md h1, .md h2, .md h3 { font-weight: 700; font-size: 1em; }
+
+/* ---- графики (recharts) ----
+   Цвета сетки и подписей задаются атрибутами прямо в svg, поэтому в тёмной теме
+   они остались бы светло-серыми на тёмном. CSS-правило перебивает атрибут —
+   так графики следуют за темой, не таща её в JS. */
+.recharts-cartesian-grid line { stroke: var(--color-line); }
+.recharts-cartesian-axis-line, .recharts-cartesian-axis-tick-line { stroke: var(--color-line); }
+.recharts-text { fill: var(--color-ink-soft); }
+/* Подпись в легенде recharts красит цветом серии через style: янтарная
+   «эскалации» на белом давала 2.1:1. Цвет серии остаётся у значка. */
+.recharts-legend-item-text { color: var(--color-ink-soft) !important; }
+/* Подсветка под курсором приезжает с зашитым fill="#ccc": на светлой теме это
+   мутный серый блок поверх столбцов, на тёмной — светлое пятно во весь ряд.
+   Правило перебивает атрибут (как и для сетки выше) — подсветка становится
+   лёгким затемнением в цвете текста. Вертикальная линия у графиков-линий —
+   это тот же класс, но на элементе <line>: ей нужен stroke, не fill. */
+.recharts-tooltip-cursor { fill: var(--color-ink); opacity: 0.06; }
+line.recharts-tooltip-cursor { stroke: var(--color-line); opacity: 1; }
+.recharts-default-tooltip {
+  background: var(--color-surface) !important;
+  border-color: var(--color-line) !important;
+  border-radius: 0.75rem;
+  color: var(--color-ink);
+}
+
+/* ---- смена темы: волна из левого верхнего угла ----
+   Штатное перекрёстное затухание отключаем: новый кадр должен именно
+   наплывать поверх старого, иначе поверх волны идёт ещё и растворение и
+   картинка мутнеет.
+
+   Волна описана здесь, а не в JS, намеренно. Раньше круг раскрывал
+   element.animate() после transition.ready — и между появлением снимков и
+   первым кадром скрипта успевал пройти кадр, в котором новый снимок уже
+   нарисован целиком: экран моргал новой темой, а потом волна начинала идти
+   заново. Правило CSS браузер применяет к псевдоэлементу сразу при создании,
+   так что этого зазора просто нет. */
+@keyframes theme-sweep {
+  from { clip-path: circle(0% at 0% 0%); }
+  to { clip-path: circle(150% at 0% 0%); }   /* 150% — чтобы накрыть дальний угол */
+}
+::view-transition-old(root) { animation: none; mix-blend-mode: normal; z-index: 0; }
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+  z-index: 1;
+  animation: theme-sweep 1500ms cubic-bezier(0.45, 0.05, 0.2, 1);
+}
+
+/* скроллбар потоньше */
+* { scrollbar-width: thin; scrollbar-color: var(--color-line) transparent; }
+
+/* уважение reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
